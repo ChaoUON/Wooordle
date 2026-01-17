@@ -907,11 +907,11 @@ const btnNextWord = document.getElementById("btnNextWord");
   }
 
   function calculateHintsPerType(wordCount){
-    // Every 5 words (or less than 5), each hint type gets 1
-    // 1-5 words -> 1 hint each
-    // 6-10 words -> 2 hints each
-    // 11-15 words -> 3 hints each, etc.
-    return Math.ceil(wordCount / 5);
+    // Every 5 words (or less than 5), each hint type gets 2
+    // 1-5 words -> 2 hints each
+    // 6-10 words -> 4 hints each
+    // 11-15 words -> 6 hints each, etc.
+    return Math.ceil(wordCount / 5) * 2;
   }
 
   function startTimerForWord(){
@@ -1480,6 +1480,8 @@ closeResult();
     const hintsUsedCat = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat, 0);
     const hintsUsedDef = wordResults.reduce((acc,r)=>acc + r.hintsUsed.def, 0);
     const hintsUsedEx  = wordResults.reduce((acc,r)=>acc + r.hintsUsed.ex, 0);
+    const hintsPerType = calculateHintsPerType(sessionWords.length);
+    const hintsTotal = hintsPerType * 3;
 
     sideStatsBody.innerHTML = `
       <div class="statGrid">
@@ -1493,11 +1495,11 @@ closeResult();
           <div class="kpi"><div class="label">Avg attempts<br>(with hints)</div><div class="big">${avgAttempts(withHint)}</div></div>
         </div>
         <div class="statBox">
-          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / 6</div></div>
+          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / ${hintsTotal}</div></div>
           <div class="summaryHintList">
-            <div class="summaryHintItem"><span class="k">- Category</span><span class="v">${hintsUsedCat} / 2</span></div>
-            <div class="summaryHintItem"><span class="k">- Definition</span><span class="v">${hintsUsedDef} / 2</span></div>
-            <div class="summaryHintItem"><span class="k">- Example</span><span class="v">${hintsUsedEx} / 2</span></div>
+            <div class="summaryHintItem"><span class="k">- Category</span><span class="v">${hintsUsedCat} / ${hintsPerType}</span></div>
+            <div class="summaryHintItem"><span class="k">- Definition</span><span class="v">${hintsUsedDef} / ${hintsPerType}</span></div>
+            <div class="summaryHintItem"><span class="k">- Example</span><span class="v">${hintsUsedEx} / ${hintsPerType}</span></div>
           </div>
         </div>
       </div>
@@ -1528,6 +1530,8 @@ closeResult();
     const hintsUsedCat = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat, 0);
     const hintsUsedDef = wordResults.reduce((acc,r)=>acc + r.hintsUsed.def, 0);
     const hintsUsedEx  = wordResults.reduce((acc,r)=>acc + r.hintsUsed.ex, 0);
+    const hintsPerType = calculateHintsPerType(sessionWords.length);
+    const hintsTotal = hintsPerType * 3;
 
     // Table rows
     const rows = wordResults.map((r, idx) => {
@@ -1563,8 +1567,8 @@ closeResult();
           <div class="kpi"><div class="label">Avg attempts<br>(with hints)</div><div class="big">${avgAttempts(withHint)}</div></div>
         </div>
         <div class="statBox">
-          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / 6</div></div>
-          <div class="muted">Category: ${hintsUsedCat} / 2, Definition: ${hintsUsedDef} / 2, Example: ${hintsUsedEx} / 2</div>
+          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / ${hintsTotal}</div></div>
+          <div class="muted">Category: ${hintsUsedCat} / ${hintsPerType}, Definition: ${hintsUsedDef} / ${hintsPerType}, Example: ${hintsUsedEx} / ${hintsPerType}</div>
           <hr class="divider"/>
           <div class="muted">
             Remaining hints: Category ${hintsRemaining.cat}, Definition ${hintsRemaining.def}, Example ${hintsRemaining.ex}
