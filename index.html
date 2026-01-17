@@ -401,6 +401,32 @@
 
     .chipRow{display:inline-flex;gap:6px;flex-wrap:wrap;vertical-align:middle}
     .chip{display:inline-block;padding:2px 8px;border:1px solid #ddd;border-radius:999px;font-size:12px;background:#fafafa}
+
+    /* --- How To Play examples (mini tiles like Wordle) --- */
+    .howtoExamples{ margin-top: 8px; }
+    .howtoExamples .exTitle{ font-weight:800; margin: 10px 0 8px; font-size:14px; }
+    .howtoExamples .exRow{ display:flex; gap:6px; margin: 8px 0 6px; }
+    .howtoExamples .exTile{
+      width:28px; height:28px;
+      border:2px solid #878a8c;
+      border-radius:0;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:20px;
+      text-transform:uppercase;
+      background:#fff;
+      color:#111;
+      line-height:1;
+    }
+    .howtoExamples .exTile.correct{ background:var(--correct); border-color:var(--correct); color:#fff; }
+    .howtoExamples .exTile.present{ background:var(--present); border-color:var(--present); color:#fff; }
+    .howtoExamples .exTile.absent{  background:var(--absent);  border-color:var(--absent);  color:#fff; }
+    .howtoExamples .exText{
+      font-size:14px;
+      font-weight:650;
+      margin: 0 0 14px;
+    }
+    .howtoExamples .exText b{ font-weight:900; }
+
 </style>
 </head>
 <body>
@@ -468,12 +494,39 @@
           <h2>Hints (current word)</h2>
           <div id="hintPanel" class="muted">No hints used yet.</div>
 <hr class="divider"/>
-          <h2>Session rules</h2>
+          <h2>How To Play</h2>
           <div class="muted">
-            - 10 words per session (or fewer if your active pool is smaller).<br>
-            - Total hints per session: 6 (2×Category, 2×Definition, 2×Example).<br>
-            - Word length varies by entry; guesses must match the current length.<br>
-            - After each word (win or lose), the full entry is shown.
+            <div class="howtoExamples">
+              <div class="exTitle">Examples</div>
+
+              <div class="exRow" aria-hidden="true">
+                <div class="exTile correct">H</div>
+                <div class="exTile">A</div>
+                <div class="exTile">P</div>
+                <div class="exTile">P</div>
+                <div class="exTile">Y</div>
+              </div>
+              <div class="exText"><b>H</b> is in the word and in the correct spot.</div>
+
+              <div class="exRow" aria-hidden="true">
+                <div class="exTile">T</div>
+                <div class="exTile present">O</div>
+                <div class="exTile">D</div>
+                <div class="exTile">A</div>
+                <div class="exTile">Y</div>
+              </div>
+              <div class="exText"><b>O</b> is in the word but in the wrong spot.</div>
+
+              <div class="exRow" aria-hidden="true">
+                <div class="exTile">S</div>
+                <div class="exTile">M</div>
+                <div class="exTile">I</div>
+                <div class="exTile absent">L</div>
+                <div class="exTile">E</div>
+              </div>
+              <div class="exText"><b>L</b> is not in the word in any spot.</div>
+            </div>
+
           </div>
         </div>
       
