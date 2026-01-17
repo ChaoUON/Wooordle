@@ -1,0 +1,2030 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Wow Wow Wow ... Wooordle!</title>
+  <style>
+    :root{
+      --bg:#f3f3f3;
+      --panel:#ffffff;
+      --text:#111;
+      --muted:#666;
+      --border:#d9d9d9;
+      --key:#e6e6e6;
+      --keyText:#111;
+      --absent:#787c7e;   /* grey */
+      --present:#c9b458;  /* yellow */
+      --correct:#6aaa64;  /* green */
+      --shadow: 0 10px 25px rgba(0,0,0,.08);
+      --radius: 18px;
+      --tile: 56px;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      display:flex; min-height:100vh; align-items:center; justify-content:center;
+      padding:24px;
+    }
+    .app{
+      width:min(1120px, 100%);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+    header{
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      padding:6px 6px 18px 6px; border-bottom:1px solid var(--border);
+    }
+    .brand{display:flex; gap:14px; align-items:center;}
+    .logo{
+      width:56px; height:56px; border-radius:14px;
+      border:4px solid #111; display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      grid-template-rows:repeat(3, 1fr);
+      overflow:hidden;
+    }
+    .sq{border:1px solid #1111; background:#fff;}
+    .sq.g{background:var(--correct);}
+    .sq.y{background:var(--present);}
+    .title{line-height:1.1;}
+    .title h1{margin:0; font-size:30px; letter-spacing:.2px;}
+    .title p{margin:6px 0 0; color:var(--muted); font-size:13px;}
+    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    button{
+      appearance:none; border:1px solid var(--border); background:#fff; color:var(--text);
+      padding:10px 14px; border-radius:999px; cursor:pointer;
+      font-weight:650;
+    }
+    button.primary{background:#111; color:#fff; border-color:#111;}
+    button:disabled{opacity:.55; cursor:not-allowed;}
+    .pill{
+      border:1px dashed var(--border);
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+      background:#fff;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    main{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      padding-top:18px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      main{grid-template-columns:1fr;}
+    }
+
+    .boardWrap{display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;}
+    .board{
+      display:grid;
+      gap:10px;
+      user-select:none;
+      max-width:100%;
+      overflow-x:auto;
+      padding-bottom:4px;
+    }
+    .row{display:grid; gap:10px;}
+    .tile{
+      width:var(--tile); height:var(--tile);
+      border:2px solid var(--border);
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; font-weight:800;
+      text-transform:uppercase;
+      background:#fff;
+      flex:0 0 auto;
+    }
+    .tile.filled{border-color:#b8b8b8;}
+    .tile.absent{background:var(--absent); border-color:var(--absent); color:#fff;}
+    .tile.present{background:var(--present); border-color:var(--present); color:#fff;}
+    .tile.correct{background:var(--correct); border-color:var(--correct); color:#fff;}
+
+    .kbd{
+      width:min(600px, 100%);
+      display:flex; flex-direction:column; gap:8px;
+      margin-top:6px;
+    }
+    .kbdRow{display:flex; gap:6px; justify-content:center; flex-wrap:wrap;}
+    .key{
+      background:var(--key);
+      color:var(--keyText);
+      border:none; border-radius:10px;
+      padding:12px 10px;
+      min-width:38px;
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+    }
+    .key.wide{min-width:96px;}
+    .key.absent{background:var(--absent); color:#fff;}
+    .key.present{background:var(--present); color:#fff;}
+    .key.correct{background:var(--correct); color:#fff;}
+
+    .toast{
+      margin-top:6px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#fafafa;
+      color:var(--text);
+      font-weight:650;
+      width:min(600px, 100%);
+      text-align:center;
+      display:none;
+    }
+
+    .side{
+      border-left:1px solid var(--border);
+      padding-left:14px;
+    }
+    @media (max-width: 980px){
+      .side{border-left:none; padding-left:0; border-top:1px solid var(--border); padding-top:14px;}
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+    }
+    .card h2{margin:0 0 10px; font-size:14px;}
+    .hintLine{font-size:13px; line-height:1.5; margin:6px 0;}
+    .muted{color:var(--muted); font-size:12px; line-height:1.45;}
+    .divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+    .rowButtons{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+    /* Modals */
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.38);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      z-index:999;
+    }
+    .modal{
+      width:min(1020px, 100%);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .modalHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+    }
+    .modalHeader h2{margin:0; font-size:16px;}
+    .modalBody{padding:14px 16px;}
+    .closeX{
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+      padding:8px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    textarea{
+      width:100%;
+      min-height:220px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      resize:vertical;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      margin-top:10px;
+    }
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (max-width: 920px){
+      .split{grid-template-columns:1fr;}
+    }
+    .panel{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+    .panel h3{margin:0 0 10px; font-size:14px;}
+    .scroll{max-height:340px; overflow:auto; padding-right:6px;}
+    .catRow{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding:8px 8px; border-radius:10px;
+    }
+    .catRow:hover{background:#fafafa;}
+    .catLeft{display:flex; gap:10px; align-items:center;}
+    .subList{margin:6px 0 0 34px; display:flex; flex-direction:column; gap:6px;}
+    .subItem{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding:6px 8px; border-radius:10px;
+    }
+    .subItem:hover{background:#fafafa;}
+    .statGrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 680px){ .statGrid{grid-template-columns:1fr;} }
+    .statBox{border:1px solid var(--border); border-radius:14px; padding:12px;}
+    .big{font-weight:800; font-size:22px;}
+    .kpi{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+    .kpi .label{color:var(--muted); font-size:12px;}
+    table{width:100%; border-collapse:collapse; font-size:12px;}
+    th, td{border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; vertical-align:top;}
+    th{color:var(--muted); font-weight:700;}
+  
+    .outcomeBanner{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      margin-bottom: 12px;
+      font-weight: 700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .outcomeBanner.success{
+      background: #ecf7ef;
+      border-color: #bfe3c8;
+    }
+    .outcomeBanner.fail{
+      background: #fff2f2;
+      border-color: #f0c2c2;
+    }
+
+
+    .betweenBar{
+      margin-top: 14px;
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background:#fafafa;
+    }
+    .betweenLeft{ display:flex; flex-direction:column; gap:2px; }
+    .betweenTitle{ font-weight:700; }
+    .betweenSub{ color:#666; font-size:13px; }
+    .betweenActions{ display:flex; gap:10px; align-items:center; }
+    .btn.primary{
+      background:#111;
+      color:#fff;
+      border-color:#111;
+    }
+
+
+    /* --- Compact, aligned session summary (right panel) --- */
+    .statGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    .statBox{
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      padding: 14px;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .kpi{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+    .kpi .label{
+      color:#666;
+      font-size: 13px;
+      line-height: 1.25;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .kpi .big{
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: -0.3px;
+    }
+    .statBox .divider{
+      border: none;
+      height: 1px;
+      background: #eee;
+      margin: 4px 0;
+    }
+    /* Smaller numbers for the left block rows (more compact) */
+    .statBox:first-child .kpi .big{
+      font-size: 14px;
+    }
+    /* Hint breakdown list */
+    .summaryHintList{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .summaryHintItem{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .summaryHintItem .k{
+      color:#666;
+      font-size: 12px;
+    }
+    .summaryHintItem .v{
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+
+    .chipRow{display:inline-flex;gap:6px;flex-wrap:wrap;vertical-align:middle}
+    .chip{display:inline-block;padding:2px 8px;border:1px solid #ddd;border-radius:999px;font-size:12px;background:#fafafa}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <div class="sq"></div><div class="sq"></div><div class="sq"></div>
+          <div class="sq"></div><div class="sq y"></div><div class="sq g"></div>
+          <div class="sq g"></div><div class="sq g"></div><div class="sq g"></div>
+        </div>
+        <div class="title">
+          <h1>My Wow Wow Wow ... Wooordle!</h1>
+          <p id="subtitle">Import a vocabulary list and play a session with limited hints.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="btnNew" class="primary">New session</button>
+        <button id="btnDict">Settings</button>
+        <button id="btnReveal">Reveal</button>
+        <button id="btnClear">Clear row</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="boardWrap">
+        <div id="sessionPills" class="rowButtons" style="margin-top:0;">
+          <span class="pill" id="pillProgress">Word 0 / 10</span>
+          <span class="pill" id="pillAttempts">Attempts: 0 / 6</span>
+          <span class="pill" id="pillLen">Length: 5</span>
+          <span class="pill" id="pillTime" style="display:none">Time: 2:00</span>
+          <span class="pill" id="pillActive">Active pool: 0</span>
+        </div>
+
+        <div id="board" class="board" role="grid" aria-label="Wordle board"></div>
+
+        <div class="rowButtons">
+          <button id="btnHintCAT">Hint: Category (2)</button>
+          <button id="btnHintDef">Hint: Definition (2)</button>
+          <button id="btnHintEx">Hint: Example (2)</button>
+        </div>
+
+        <div class="kbd" aria-label="keyboard">
+          <div class="kbdRow" id="row1"></div>
+          <div class="kbdRow" id="row2"></div>
+          <div class="kbdRow" id="row3"></div>
+        </div>
+
+        <div id="betweenWordsBar" class="betweenBar" style="display:none;">
+        <div class="betweenLeft">
+          <div class="betweenTitle">Word complete</div>
+          <div class="betweenSub">Continue the current session.</div>
+        </div>
+        <div class="betweenActions">
+          <button class="btn primary" id="btnNextWordMain">Next word</button>
+          <button class="btn" id="btnShowStatsMain">Show stats</button>
+        </div>
+      </div>
+      <div id="toast" class="toast"></div>
+        <div class="muted">Keyboard: letters to type, Enter to submit, Backspace to delete. (Typing in textareas is never intercepted.)</div>
+      </section>
+
+      <aside class="side">
+        <div class="card">
+          <h2>Hints (current word)</h2>
+          <div id="hintPanel" class="muted">No hints used yet.</div>
+<hr class="divider"/>
+          <h2>Session rules</h2>
+          <div class="muted">
+            - 10 words per session (or fewer if your active pool is smaller).<br>
+            - Total hints per session: 6 (2×Category, 2×Definition, 2×Example).<br>
+            - Word length varies by entry; guesses must match the current length.<br>
+            - After each word (win or lose), the full entry is shown.
+          </div>
+        </div>
+      
+        <div class="card" id="sideStatsCard" style="margin-top:14px; display:none;">
+          <h2>Session summary</h2>
+          <div id="sideStatsBody" class="muted">Finish a session to see stats here.</div>
+        </div>
+
+      </aside>
+    </main>
+  </div>
+
+  <!-- Dictionary modal -->
+  <div id="dictBackdrop" class="modalBackdrop" role="dialog" aria-modal="true" aria-label="Dictionary">
+    <div class="modal">
+      <div class="modalHeader">
+        <h2>Dictionary</h2>
+        <button id="btnCloseDict" class="closeX" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <div class="muted">
+          Structured import format:
+          <span class="mono">[Category]&lt;TAB&gt;name</span>,
+          <span class="mono">[Subcategory]&lt;TAB&gt;name</span>,
+          then entries as <span class="mono">number&lt;TAB&gt;word&lt;TAB&gt;pos&lt;TAB&gt;definition&lt;TAB&gt;example</span>.
+          (Tabs are recommended, but multiple spaces also work.)
+        </div>
+
+        <div class="rowButtons" style="margin-top:12px;">
+          <button id="btnImport">Import .txt…</button>
+          <input id="fileInput" type="file" accept=".txt" style="display:none;">
+          <span class="pill" id="fileName">No file</span>
+
+          <button id="btnShowRaw">Show / edit raw text</button>
+          <span class="pill" id="dictInfo">0 entries</span>
+          <span class="pill" id="activeInfo">0 active</span>
+        </div>
+
+        <div id="rawWrap" style="display:none;">
+          <textarea id="dictInput" spellcheck="false" autocomplete="off" autocapitalize="characters"></textarea>
+          <div class="rowButtons">
+            <button id="btnApplyRaw">Parse & apply</button>
+            <span class="muted">Raw text is parsed on Apply.</span>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="panel">
+            <h3>Category / Subcategory selection</h3>
+            <div class="rowButtons" style="margin-top:0;">
+              <button id="btnAllCats">All categories</button>
+              <button id="btnNoCats">No categories</button>
+            </div>
+            <hr class="divider"/>
+            <div id="selector" class="scroll"></div>
+          </div>
+
+          <div class="panel">
+            <h3>Status</h3>
+            <div id="dictStatus" class="muted">Import a dictionary in the settings to begin.</div>
+            <hr class="divider"/>
+            <h3>Tip</h3>
+            <div class="muted">
+              If you see random sentences as categories, your file was parsed as a simple word list.
+              Make sure your file contains lines like <span class="mono">[Category]&nbsp;&nbsp;Characters and their emotions</span>.
+            </div>
+            <hr class="divider"/>
+            <h3>Settings</h3>
+            <div class="muted" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input id="chkEnableReveal" type="checkbox">
+                <span><b>Enable “Reveal” button</b> (shown during sessions)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input id="chkEnableTimer" type="checkbox">
+                <span><b>Enable per-word timer</b></span>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <span class="muted">Seconds per word</span>
+                <input id="inpTimerSeconds" type="number" min="10" max="3600" step="10" value="120" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <span class="muted">Words per session</span>
+                <input id="inpSessionWords" type="number" min="5" max="100" step="5" value="10" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+              </label>
+              <div style="width:100%;height:1px;background:#eee;margin:8px 0;"></div>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <span class="muted"><b>Field separator</b></span>
+                <select id="selFieldSeparator" style="padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+                  <option value="auto">Auto-detect (|, TAB, spaces)</option>
+                  <option value="pipe">Pipe (|)</option>
+                  <option value="tab">Tab character</option>
+                  <option value="spaces">Multiple spaces</option>
+                  <option value="custom">Custom separator</option>
+                </select>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <span class="muted">Custom separator</span>
+                <input id="inpCustomSeparator" type="text" placeholder="e.g., :: or ||" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+              </label>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Word result modal -->
+  <div id="resultBackdrop" class="modalBackdrop" role="dialog" aria-modal="true" aria-label="Word result">
+    <div class="modal">
+      <div class="modalHeader">
+        <h2 id="resultTitle">Result</h2>
+        <button id="btnCloseResult" class="closeX" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <div id="resultOutcome" class="outcomeBanner" style="display:none;"></div>
+        <div id="resultBody"></div>
+        <div class="rowButtons" style="margin-top:12px;">
+          <button id="btnNextWord" class="primary">Next word</button>
+          <button id="btnShowStats">Show stats</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session stats modal -->
+  <div id="statsBackdrop" class="modalBackdrop" role="dialog" aria-modal="true" aria-label="Session stats">
+    <div class="modal">
+      <div class="modalHeader">
+        <h2>Session statistics</h2>
+        <button id="btnCloseStats" class="closeX" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <div id="statsBody"></div>
+        <div class="rowButtons" style="margin-top:12px;">
+          <button id="btnNewFromStats" class="primary">New session</button>
+          <button id="btnContinueFromStats" style="display:none;">Next word</button>
+          <button id="btnBackToGame">Back to game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------------- Utilities ----------------
+  const LETTER = /^[A-Z]$/;
+
+  function esc(s){
+    return (s ?? "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function show(el){ el.style.display = "flex"; }
+  function hide(el){ el.style.display = "none"; }
+
+  function normaliseWord(w){
+    return (w || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  }
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function evaluateGuess(guess, answer) {
+    const L = answer.length;
+    const res = Array(L).fill("absent");
+    const ans = answer.split("");
+    const used = Array(L).fill(false);
+
+    for (let i = 0; i < L; i++) {
+      if (guess[i] === answer[i]) {
+        res[i] = "correct";
+        used[i] = true;
+      }
+    }
+    for (let i = 0; i < L; i++) {
+      if (res[i] === "correct") continue;
+      const ch = guess[i];
+      let found = -1;
+      for (let j = 0; j < L; j++) {
+        if (!used[j] && ans[j] === ch) { found = j; break; }
+      }
+      if (found !== -1) {
+        res[i] = "present";
+        used[found] = true;
+      }
+    }
+    return res;
+  }
+
+  const rank = { absent: 0, present: 1, correct: 2 };
+  function mergeKeyState(prev, next) {
+    if (!prev) return next;
+    return rank[next] > rank[prev] ? next : prev;
+  }
+
+  function setTileSizeForLength(L){
+    const max = 56, min = 34;
+    const t = Math.max(min, Math.round(max - (Math.max(0, L-6) * 2.8)));
+    document.documentElement.style.setProperty("--tile", `${t}px`);
+  }
+
+  // ---------------- DOM ----------------
+  const boardEl = document.getElementById("board");
+  const toastEl = document.getElementById("toast");
+  const betweenWordsBar = document.getElementById("betweenWordsBar");
+  const btnNextWordMain = document.getElementById("btnNextWordMain");
+  const btnShowStatsMain = document.getElementById("btnShowStatsMain");
+const btnNew = document.getElementById("btnNew");
+  const btnDict = document.getElementById("btnDict");
+  const btnReveal = document.getElementById("btnReveal");
+  const chkEnableReveal = document.getElementById("chkEnableReveal");
+  const chkEnableTimer = document.getElementById("chkEnableTimer");
+  const inpTimerSeconds = document.getElementById("inpTimerSeconds");
+  const inpSessionWords = document.getElementById("inpSessionWords");
+  const selFieldSeparator = document.getElementById("selFieldSeparator");
+  const inpCustomSeparator = document.getElementById("inpCustomSeparator");
+const btnClear = document.getElementById("btnClear");
+
+  const btnHintCAT = document.getElementById("btnHintCAT");
+  const btnHintDef = document.getElementById("btnHintDef");
+  const btnHintEx  = document.getElementById("btnHintEx");
+  const hintPanel = document.getElementById("hintPanel");
+const sideStatsCard = document.getElementById("sideStatsCard");
+  const sideStatsBody = document.getElementById("sideStatsBody");
+const pillProgress = document.getElementById("pillProgress");
+  const pillAttempts = document.getElementById("pillAttempts");
+  const pillLen = document.getElementById("pillLen");
+  const pillActive = document.getElementById("pillActive");
+  const pillTime = document.getElementById("pillTime");
+  const subtitle = document.getElementById("subtitle");
+
+  // Dictionary modal DOM
+  const dictBackdrop = document.getElementById("dictBackdrop");
+  const btnCloseDict = document.getElementById("btnCloseDict");
+  const btnImport = document.getElementById("btnImport");
+  const fileInput = document.getElementById("fileInput");
+  const fileName = document.getElementById("fileName");
+  const btnShowRaw = document.getElementById("btnShowRaw");
+  const rawWrap = document.getElementById("rawWrap");
+  const dictInput = document.getElementById("dictInput");
+  const btnApplyRaw = document.getElementById("btnApplyRaw");
+  const dictInfo = document.getElementById("dictInfo");
+  const activeInfo = document.getElementById("activeInfo");
+  const dictStatus = document.getElementById("dictStatus");
+  const selectorEl = document.getElementById("selector");
+
+  const btnAllCats = document.getElementById("btnAllCats");
+  const btnNoCats = document.getElementById("btnNoCats");
+
+  // Result modal DOM
+  const resultBackdrop = document.getElementById("resultBackdrop");
+  const btnCloseResult = document.getElementById("btnCloseResult");
+  const resultTitle = document.getElementById("resultTitle");
+  const resultBody = document.getElementById("resultBody");
+  const resultOutcome = document.getElementById("resultOutcome");
+const btnNextWord = document.getElementById("btnNextWord");
+  const btnShowStats = document.getElementById("btnShowStats");
+
+  // Stats modal DOM
+  const statsBackdrop = document.getElementById("statsBackdrop");
+  const btnCloseStats = document.getElementById("btnCloseStats");
+  const statsBody = document.getElementById("statsBody");
+  const btnNewFromStats = document.getElementById("btnNewFromStats");
+  const btnContinueFromStats = document.getElementById("btnContinueFromStats");
+  const btnBackToGame = document.getElementById("btnBackToGame");
+
+  const keyRows = {
+    row1: document.getElementById("row1"),
+    row2: document.getElementById("row2"),
+    row3: document.getElementById("row3"),
+  };
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => { toastEl.style.display = "none"; }, 1800);
+  }
+  // Persistent toast (used by Reveal)
+  function hideToast(){
+    if (!toastEl) return;
+    // showToast uses a function property timer (showToast._t)
+    clearTimeout(showToast._t);
+    showToast._t = null;
+    toastEl.style.display = "none";
+  }
+
+  function showToastPersistent(html){
+    if (!toastEl) return;
+    clearTimeout(showToast._t);
+    showToast._t = null;
+    toastEl.innerHTML = html;
+    toastEl.style.display = "block";
+  }
+
+  function showBetweenWordsBar(){
+    if (!betweenWordsBar) return;
+    const sessionFinished = (wordResults && sessionWords && wordResults.length === sessionWords.length);
+    if (gameOverWord && !sessionFinished){
+      betweenWordsBar.style.display = "flex";
+    } else {
+      betweenWordsBar.style.display = "none";
+    }
+  }
+
+  function hideBetweenWordsBar(){
+    if (!betweenWordsBar) return;
+    betweenWordsBar.style.display = "none";
+  }
+
+
+
+  // modal open/close helpers
+  function openDict(){
+    show(dictBackdrop);
+    if (chkEnableReveal) chkEnableReveal.checked = revealEnabled;
+    chkEnableTimer.checked = timerEnabled;
+    inpTimerSeconds.value = String(timerSeconds);
+    updateTimerPauseState();
+  }
+  function closeDict(){
+    hide(dictBackdrop);
+    updateTimerPauseState();
+  }
+  dictBackdrop.addEventListener("click", (e)=>{ if (e.target === dictBackdrop) closeDict(); });
+
+  function openResult(){
+    show(resultBackdrop);
+    updateTimerPauseState();
+
+    // Outcome banner (replaces the hard-to-see toast while the result modal is open)
+    if (resultOutcome){
+      if (lastOutcome){
+        resultOutcome.textContent = lastOutcome.text;
+        resultOutcome.classList.remove("success","fail");
+        resultOutcome.classList.add(lastOutcome.kind);
+        resultOutcome.style.display = "flex";
+      } else {
+        resultOutcome.style.display = "none";
+      }
+    }
+}
+  function closeResult(){
+    lastOutcome = null;
+    if (resultOutcome) resultOutcome.style.display = "none";
+    hide(resultBackdrop);
+    updateTimerPauseState();
+    renderSideStats();
+    showBetweenWordsBar();
+}
+  resultBackdrop.addEventListener("click", (e)=>{ if (e.target === resultBackdrop) closeResult(); });
+
+  function openStats(){
+    show(statsBackdrop);
+    updateTimerPauseState();
+  }
+  function closeStats(){
+    hide(statsBackdrop);
+    updateTimerPauseState();
+  }
+  statsBackdrop.addEventListener("click", (e)=>{ if (e.target === statsBackdrop) closeStats(); });
+
+  
+  // ---------------- Settings ----------------
+  // Reveal is optional (some users consider it "too powerful").
+  // We keep it off by default and only show the button when enabled in Dictionary > Settings.
+  let revealEnabled = false;
+  let timerEnabled = false;
+  let timerSeconds = 120; // per word
+  let sessionWordsCount = 10; // words per session
+  let fieldSeparator = "auto"; // "auto", "pipe", "tab", "spaces", or "custom"
+  let customSeparator = ""; // for custom separator mode
+  let timeLeft = 0;
+  let timerHandle = null;
+  let timerPaused = false;
+
+  function anyModalOpen(){
+    return (
+      (dictBackdrop && dictBackdrop.style.display === "flex") ||
+      (statsBackdrop && statsBackdrop.style.display === "flex") ||
+      (resultBackdrop && resultBackdrop.style.display === "flex")
+    );
+  }
+
+  function updateTimerPauseState(){
+    timerPaused = timerEnabled && anyModalOpen();
+  }
+
+  function loadSettings(){
+    try{
+      revealEnabled = localStorage.getItem("wv_revealEnabled") === "1";
+      timerEnabled = localStorage.getItem("wv_timerEnabled") === "1";
+      const ts = parseInt(localStorage.getItem("wv_timerSeconds") || "120", 10);
+      timerSeconds = Number.isFinite(ts) && ts > 0 ? ts : 120;
+      const sw = parseInt(localStorage.getItem("wv_sessionWords") || "10", 10);
+      sessionWordsCount = Number.isFinite(sw) && sw > 0 ? sw : 10;
+      fieldSeparator = localStorage.getItem("wv_fieldSeparator") || "auto";
+      customSeparator = localStorage.getItem("wv_customSeparator") || "";
+    }catch(_e){ revealEnabled = false; }
+    applyRevealSetting();
+    applyTimerSetting();
+    if (chkEnableReveal) chkEnableReveal.checked = revealEnabled; chkEnableTimer.checked = timerEnabled; inpTimerSeconds.value = String(timerSeconds); inpSessionWords.value = String(sessionWordsCount); selFieldSeparator.value = fieldSeparator; inpCustomSeparator.value = customSeparator;
+  }
+
+  function saveRevealSetting(val){
+    revealEnabled = !!val;
+    try{
+      localStorage.setItem("wv_revealEnabled", revealEnabled ? "1" : "0");
+    }catch(_e){}
+    applyRevealSetting();
+    applyTimerSetting();
+  }
+
+  function applyRevealSetting(){
+    if (!btnReveal) return;
+    btnReveal.style.display = revealEnabled ? "inline-block" : "none";
+  }
+
+  function applyTimerSetting(){
+    if (timerEnabled && inSession && currentEntry && !gameOverWord){
+      pillTime.style.display = "inline-flex";
+    } else {
+      pillTime.style.display = "none";
+    }
+    if (dictBackdrop && dictBackdrop.style.display !== "none"){
+      chkEnableTimer.checked = timerEnabled;
+      inpTimerSeconds.value = String(timerSeconds);
+    }
+  }
+
+  function saveTimerSetting(){
+    timerEnabled = !!chkEnableTimer.checked;
+    const v = parseInt(inpTimerSeconds.value || "120", 10);
+    timerSeconds = Number.isFinite(v) && v > 0 ? v : 120;
+    const sw = parseInt(inpSessionWords.value || "10", 10);
+    sessionWordsCount = Number.isFinite(sw) && sw > 0 ? sw : 10;
+    fieldSeparator = selFieldSeparator.value || "auto";
+    customSeparator = inpCustomSeparator.value || "";
+    try{
+      localStorage.setItem("wv_timerEnabled", timerEnabled ? "1" : "0");
+      localStorage.setItem("wv_timerSeconds", String(timerSeconds));
+      localStorage.setItem("wv_sessionWords", String(sessionWordsCount));
+      localStorage.setItem("wv_fieldSeparator", fieldSeparator);
+      localStorage.setItem("wv_customSeparator", customSeparator);
+    }catch(_e){}
+    applyTimerSetting();
+  }
+
+  function stopTimer(){
+    if (timerHandle){
+      clearInterval(timerHandle);
+      timerHandle = null;
+    }
+  }
+
+  function formatTime(s){
+    const m = Math.floor(s/60);
+    const r = s%60;
+    return `${m}:${String(r).padStart(2,"0")}`;
+  }
+
+  function calculateHintsPerType(wordCount){
+    // Every 5 words (or less than 5), each hint type gets 1
+    // 1-5 words -> 1 hint each
+    // 6-10 words -> 2 hints each
+    // 11-15 words -> 3 hints each, etc.
+    return Math.ceil(wordCount / 5);
+  }
+
+  function startTimerForWord(){
+    stopTimer();
+    if (!timerEnabled || !inSession || !currentEntry || gameOverWord) {
+      pillTime.style.display = "none";
+      return;
+    }
+    timeLeft = timerSeconds;
+    pillTime.style.display = "inline-flex";
+    pillTime.textContent = `Time: ${formatTime(timeLeft)}`;
+    timerHandle = setInterval(()=>{
+      updateTimerPauseState();
+      if (!timerEnabled || !inSession || !currentEntry || gameOverWord){
+        stopTimer();
+        pillTime.style.display = "none";
+        return;
+      }
+      // Pause countdown while any modal is open (dictionary/stats/word result)
+      if (timerPaused){
+        pillTime.textContent = `Time: ${formatTime(timeLeft)}`;
+        return;
+      }
+      timeLeft -= 1;
+      if (timeLeft <= 0){
+        timeLeft = 0;
+        pillTime.textContent = `Time: 0:00`;
+        endWordAndShowResult(false, "time");
+        stopTimer();
+        applyTimerSetting();
+        return;
+      }
+      pillTime.textContent = `Time: ${formatTime(timeLeft)}`;
+    }, 1000);
+  }
+
+
+
+  // ---------------- Dictionary model ----------------
+  // Each entry: {category, subcategory, number, word, pos, definition, example}
+  let allEntries = [];
+  let selectedCats = {};
+  let selectedSubs = {};
+
+  function setDictStatus(msg){ dictStatus.textContent = msg || ""; }
+
+  // Parse [Category] or [Subcategory] headers, handling any separator after the marker
+  function parseHeaderLine(line){
+    // Returns {type:"cat"|"sub", name} or null
+    const s = (line || "").replace(/^\uFEFF/, "").trimStart(); // drop BOM + leading spaces
+    let m = s.match(/^\[Category\]\s*(.*)$/i);
+    if (m) {
+      // Extract the part after [Category] and the separator
+      const rest = m[1];
+      // Use splitFields to handle any separator (|, TAB, spaces, custom)
+      const parts = splitFields(rest);
+      // Find the first non-empty part
+      const name = parts.find(p => p.trim());
+      if (name) return { type:"cat", name: name.trim() };
+    }
+    
+    m = s.match(/^\[Subcategory\]\s*(.*)$/i);
+    if (m) {
+      // Extract the part after [Subcategory] and the separator
+      const rest = m[1];
+      // Use splitFields to handle any separator (|, TAB, spaces, custom)
+      const parts = splitFields(rest);
+      // Find the first non-empty part
+      const name = parts.find(p => p.trim());
+      if (name) return { type:"sub", name: name.trim() };
+    }
+    
+    return null;
+  }
+
+  function splitFields(line){
+    // Use global fieldSeparator setting to split the line
+    if (fieldSeparator === "custom" && customSeparator) {
+      return line.split(customSeparator);
+    } else if (fieldSeparator === "pipe") {
+      return line.split("|");
+    } else if (fieldSeparator === "tab") {
+      return line.split("\t");
+    } else if (fieldSeparator === "spaces") {
+      return line.trim().split(/\s{2,}/);
+    } else {
+      // "auto" mode: try pipe first, then TAB, then multiple spaces
+      if (line.includes("|")) return line.split("|");
+      if (line.includes("\t")) return line.split("\t");
+      return line.trim().split(/\s{2,}/);
+    }
+  }
+
+  function parseStructured(text){
+    const lines = (text || "").split(/\r?\n/);
+    let cat = null;
+    let sub = null;
+    const out = [];
+    for (const raw of lines){
+      const ln = raw.replace(/\s+$/,""); // trimEnd
+      if (!ln.trim()) continue;
+      if (/^(FORMAT:|FIELDS:|HEADERS:)/.test(ln)) continue;
+
+      const hdr = parseHeaderLine(ln);
+      if (hdr){
+        if (hdr.type === "cat"){ cat = hdr.name; sub = null; }
+        else { sub = hdr.name; }
+        continue;
+      }
+
+      const parts = splitFields(ln);
+      
+      if (parts.length >= 4){
+        let number, word, pos, definition, example;
+        
+        if (parts.length === 4){
+          // Format without number: word | pos | definition | example
+          number = out.length + 1; // auto-assign number based on order
+          word = normaliseWord(parts[0]);
+          pos = (parts[1] || "").trim();
+          definition = (parts[2] || "").trim();
+          example = parts[3].trim();
+        } else {
+          // Format with number: number | word | pos | definition | example
+          number = parseInt(parts[0], 10);
+          word = normaliseWord(parts[1]);
+          pos = (parts[2] || "").trim();
+          definition = (parts[3] || "").trim();
+          example = parts.slice(4).join(" ").trim();
+        }
+        
+        // Accept entry if word is valid; number validation only for 5-field format
+        const isValid = word && (parts.length === 4 || Number.isFinite(number));
+        if (isValid){
+          out.push({
+            category: cat || "(Uncategorised)",
+            subcategory: sub || "(General)",
+            number: number,
+            word,
+            pos,
+            definition,
+            example
+          });
+        }
+      }
+    }
+    out.sort((a,b)=> (a.number||0)-(b.number||0) || a.word.localeCompare(b.word));
+    return out;
+  }
+
+  function parseSimpleWords(text){
+    const lines = (text || "").split(/\r?\n/);
+    const set = new Set();
+    for (const ln of lines){
+      const w = normaliseWord(ln);
+      if (w) set.add(w);
+    }
+    const words = Array.from(set).sort((a,b)=>a.localeCompare(b));
+    return words.map((w, idx)=>({
+      category:"Uncategorised",
+      subcategory:"Words",
+      number: idx+1,
+      word:w,
+      pos:"",
+      definition:"",
+      example:""
+    }));
+  }
+
+  function buildSelectionStateFromEntries(){
+    selectedCats = {};
+    selectedSubs = {};
+    for (const e of allEntries){
+      if (!Object.prototype.hasOwnProperty.call(selectedCats, e.category)) selectedCats[e.category] = true;
+      if (!selectedSubs[e.category]) selectedSubs[e.category] = {};
+      if (!Object.prototype.hasOwnProperty.call(selectedSubs[e.category], e.subcategory)) selectedSubs[e.category][e.subcategory] = true;
+    }
+  }
+
+  function getActivePool(){
+    // IMPORTANT: do NOT de-duplicate by word.
+    // The same surface form may appear in multiple categories/subcategories with different POS/meaning.
+    const active = [];
+    for (const e of allEntries){
+      if (!selectedCats[e.category]) continue;
+      if (selectedSubs[e.category] && selectedSubs[e.category][e.subcategory] === false) continue;
+      active.push(e);
+    }
+    return active;
+  }
+
+  function updateDictCounts(){
+    dictInfo.textContent = `${allEntries.length} entries`;
+    activeInfo.textContent = `${getActivePool().length} active`;
+    pillActive.textContent = `Active pool: ${getActivePool().length}`;
+  }
+
+  function renderSelector(){
+    selectorEl.innerHTML = "";
+    const cats = Object.keys(selectedCats).sort((a,b)=>a.localeCompare(b));
+    for (const cat of cats){
+      const catRow = document.createElement("div");
+      catRow.className = "catRow";
+
+      const left = document.createElement("div");
+      left.className = "catLeft";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!selectedCats[cat];
+      cb.addEventListener("change", () => {
+        selectedCats[cat] = cb.checked;
+        if (cb.checked && selectedSubs[cat]){
+          for (const s of Object.keys(selectedSubs[cat])) selectedSubs[cat][s] = true;
+        }
+        renderSelector();
+        updateDictCounts();
+      });
+
+      const label = document.createElement("div");
+      const subCount = Object.keys(selectedSubs[cat] || {}).length;
+      label.innerHTML = `<b>${esc(cat)}</b><div class="muted">${subCount} subcategories</div>`;
+
+      left.appendChild(cb);
+      left.appendChild(label);
+
+      catRow.appendChild(left);
+      selectorEl.appendChild(catRow);
+
+      const subList = document.createElement("div");
+      subList.className = "subList";
+
+      const subs = Object.keys(selectedSubs[cat] || {}).sort((a,b)=>a.localeCompare(b));
+      for (const sub of subs){
+        const subRow = document.createElement("div");
+        subRow.className = "subItem";
+
+        const subLeft = document.createElement("div");
+        subLeft.className = "catLeft";
+
+        const scb = document.createElement("input");
+        scb.type = "checkbox";
+        scb.checked = !!selectedSubs[cat][sub] && !!selectedCats[cat];
+        scb.disabled = !selectedCats[cat];
+        scb.addEventListener("change", () => {
+          selectedSubs[cat][sub] = scb.checked;
+          updateDictCounts();
+        });
+
+        const subLabel = document.createElement("div");
+        subLabel.textContent = sub;
+
+        subLeft.appendChild(scb);
+        subLeft.appendChild(subLabel);
+
+        subRow.appendChild(subLeft);
+        subList.appendChild(subRow);
+      }
+
+      selectorEl.appendChild(subList);
+    }
+  }
+
+  function loadFromText(text){
+    const looksStructured = /\[Category\]/i.test(text) || /\[Subcategory\]/i.test(text);
+
+    if (looksStructured){
+      const structured = parseStructured(text);
+      if (!structured.length){
+        // Do NOT fall back to "simple word list" if the file claims to be structured.
+        setDictStatus("Structured markers found, but no entries were parsed. Ensure your file uses TAB (recommended) or clear whitespace separators, and that each entry line has 5 fields.");
+        return;
+      }
+      allEntries = structured;
+      buildSelectionStateFromEntries();
+      renderSelector();
+      updateDictCounts();
+      setDictStatus("Structured dictionary loaded.");
+      return;
+    }
+
+    // Non-structured: simple word list
+    allEntries = parseSimpleWords(text);
+    buildSelectionStateFromEntries();
+    renderSelector();
+    updateDictCounts();
+    setDictStatus(allEntries.length ? "Simple word list loaded (uncategorised)." : "No usable entries found.");
+  }
+
+
+  // ---------------- Game/session model ----------------
+  const MAX_ATTEMPTS = 6;
+  const TARGET_WORDS = 10;
+
+  let sessionWords = [];       // array of entries picked for this session
+  let sessionIndex = -1;       // 0-based
+  let currentEntry = null;
+  let answer = "";
+  let lastOutcome = null; // {kind:"success"|"fail", text:"..."}
+let WORD_LEN = 5;
+
+  // hints remaining per session
+  let hintsRemaining = { cat: 2, def: 2, ex: 2 };
+
+  // per-word board state
+  let currentRow = 0;
+  let currentCol = 0;
+  let grid = [];
+  let states = [];
+  let keyState = {};
+  let gameOverWord = false;
+
+  // per-word hint usage
+  let currentWordHints = { cat: 0, def: 0, ex: 0 };
+  let currentHintLines = [];
+
+  // per-session results
+  // each item: {entry, solved, attemptsUsed, hintsUsed:{cat,def,ex}}
+  let wordResults = [];
+  let inSession = false;
+
+  function updateHintButtons(){
+    btnHintCAT.textContent = `Hint: Category (${hintsRemaining.cat})`;
+    btnHintDef.textContent = `Hint: Definition (${hintsRemaining.def})`;
+    btnHintEx.textContent  = `Hint: Example (${hintsRemaining.ex})`;
+     // Disable if: no hints remaining, no current entry, game over for this word, OR hint already used for this word
+     btnHintCAT.disabled = hintsRemaining.cat <= 0 || !currentEntry || gameOverWord || currentWordHints.cat > 0;
+     btnHintDef.disabled = hintsRemaining.def <= 0 || !currentEntry || gameOverWord || currentWordHints.def > 0;
+     btnHintEx.disabled  = hintsRemaining.ex <= 0 || !currentEntry || gameOverWord || currentWordHints.ex > 0;
+  }
+
+  function setHintPanel(){
+    if (!currentHintLines.length){
+      hintPanel.textContent = "No hints used yet.";
+      hintPanel.className = "muted";
+      return;
+    }
+    hintPanel.innerHTML = currentHintLines.map(s => `<div class="hintLine">${s}</div>`).join("");
+  }
+
+  function buildBoard(){
+    boardEl.innerHTML = "";
+    boardEl.style.gridTemplateRows = `repeat(${MAX_ATTEMPTS}, var(--tile))`;
+    for (let r = 0; r < MAX_ATTEMPTS; r++){
+      const row = document.createElement("div");
+      row.className = "row";
+      row.style.gridTemplateColumns = `repeat(${WORD_LEN}, var(--tile))`;
+      for (let c = 0; c < WORD_LEN; c++){
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.dataset.r = r;
+        tile.dataset.c = c;
+        row.appendChild(tile);
+      }
+      boardEl.appendChild(row);
+    }
+  }
+
+  function buildKeyboard(){
+    const rows = [
+      ["Q","W","E","R","T","Y","U","I","O","P"],
+      ["A","S","D","F","G","H","J","K","L"],
+      ["ENTER","Z","X","C","V","B","N","M","⌫"],
+    ];
+    keyRows.row1.innerHTML = "";
+    keyRows.row2.innerHTML = "";
+    keyRows.row3.innerHTML = "";
+    rows.forEach((letters, idx)=>{
+      const rowEl = idx===0?keyRows.row1:idx===1?keyRows.row2:keyRows.row3;
+      for (const k of letters){
+        const btn = document.createElement("button");
+        btn.className = "key" + ((k==="ENTER"||k==="⌫")?" wide":"");
+        btn.textContent = k;
+        btn.addEventListener("click", ()=>onKey(k));
+        rowEl.appendChild(btn);
+      }
+    });
+  }
+
+  function render(){
+    const tiles = boardEl.querySelectorAll(".tile");
+    tiles.forEach(tile=>{
+      const r = +tile.dataset.r;
+      const c = +tile.dataset.c;
+      const ch = grid[r][c];
+      const st = states[r][c];
+      tile.textContent = ch;
+      tile.className = "tile" + (ch ? " filled" : "");
+      if (st) tile.classList.add(st);
+    });
+
+    document.querySelectorAll(".key").forEach(btn=>{
+      const label = btn.textContent;
+      if (label==="ENTER"||label==="⌫") return;
+      const st = keyState[label];
+      btn.classList.remove("absent","present","correct");
+      if (st) btn.classList.add(st);
+    });
+
+    pillProgress.textContent = `Word ${Math.max(0, sessionIndex+1)} / ${sessionWords.length || TARGET_WORDS}`;
+    pillAttempts.textContent = `Attempts: ${currentRow} / ${MAX_ATTEMPTS}`;
+    pillLen.textContent = `Length: ${WORD_LEN}`;
+  }
+
+  function resetBoardForEntry(entry){
+    hideToast();
+    hideBetweenWordsBar();
+    // stop any existing timer; a fresh one may start after render
+    stopTimer();
+currentEntry = entry;
+    answer = entry.word;
+    WORD_LEN = answer.length;
+
+    setTileSizeForLength(WORD_LEN);
+    grid = Array.from({length: MAX_ATTEMPTS}, ()=>Array(WORD_LEN).fill(""));
+    states = Array.from({length: MAX_ATTEMPTS}, ()=>Array(WORD_LEN).fill(""));
+    keyState = {};
+    currentRow = 0;
+    currentCol = 0;
+    gameOverWord = false;
+
+    currentWordHints = { cat: 0, def: 0, ex: 0 };
+    currentHintLines = [];
+    setHintPanel();
+buildBoard();
+    render();
+    updateHintButtons();
+
+    // (re)start per-word timer if enabled
+    if (inSession && timerEnabled) startTimerForWord();
+  }
+
+  function startSession(){
+    hideBetweenWordsBar();
+    renderSideStats();
+if (sideStatsCard) sideStatsCard.style.display = "none";
+    const pool = getActivePool();
+    if (!pool.length){
+      showToast("No active words. Open Dictionary and select categories/subcategories.");
+      return;
+    }
+    const shuffled = shuffle(pool);
+    const take = Math.min(sessionWordsCount, shuffled.length);
+    sessionWords = shuffled.slice(0, take);
+    sessionIndex = 0;
+    inSession = true;
+
+    const hintsPerType = calculateHintsPerType(take);
+    hintsRemaining = { cat: hintsPerType, def: hintsPerType, ex: hintsPerType };
+    wordResults = [];
+
+    subtitle.textContent = `Session: ${take} word(s). Total hints: Category×${hintsPerType}, Definition×${hintsPerType}, Example×${hintsPerType}.`;
+    pillActive.textContent = `Active pool: ${pool.length}`;
+
+    resetBoardForEntry(sessionWords[sessionIndex]);
+    showToast(`Session started. Word 1/${take}.`);
+  }
+
+  function endWordAndShowResult(solved, reason){
+    gameOverWord = true;
+    stopTimer();
+    updateHintButtons();
+
+    const attemptsUsed = solved ? currentRow : (reason==="time" ? currentRow : MAX_ATTEMPTS);
+    wordResults.push({
+      entry: currentEntry,
+      solved,
+      attemptsUsed,
+      hintsUsed: { ...currentWordHints }
+    });
+
+    const sessionFinished = (wordResults.length === sessionWords.length);
+    if (sessionFinished) {
+      inSession = false;
+      applyTimerSetting();
+    }
+
+    resultTitle.textContent = `Word ${sessionIndex+1} / ${sessionWords.length} — ${solved ? "Solved" : (reason==="time" ? "Time up" : "Failed")}`;
+
+    const hintsUsedTotal = currentWordHints.cat + currentWordHints.def + currentWordHints.ex;
+    const failReasonLine = (!solved && reason === "time") ? `<div class="muted" style="color:#d33; font-weight:600; margin-bottom:8px;">⏱️ Time limit reached</div>` : "";
+    resultBody.innerHTML = `
+      ${failReasonLine}
+      <div class="statGrid">
+        <div class="statBox">
+          <div class="muted">Answer</div>
+          <div class="big">${esc(currentEntry.word)}</div>
+          <div class="muted">${esc(currentEntry.pos || "")}</div>
+          <hr class="divider"/>
+          <div class="muted"><b>Definition</b></div>
+          <div>${esc(currentEntry.definition || "(none)")}</div>
+          <hr class="divider"/>
+          <div class="muted"><b>Example</b></div>
+          <div>${esc(currentEntry.example || "(none)")}</div>
+        </div>
+        <div class="statBox">
+          <div class="muted">Category</div>
+          <div><b>${esc(currentEntry.category)}</b></div>
+          <div class="muted">${esc(currentEntry.subcategory)}</div>
+          <hr class="divider"/>
+          <div class="kpi"><div class="label">Attempts used</div><div class="big">${attemptsUsed}</div></div>
+          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal}</div></div>
+          <div class="muted">Category: ${currentWordHints.cat}, Definition: ${currentWordHints.def}, Example: ${currentWordHints.ex}</div>
+          <hr class="divider"/>
+          <div class="muted"><b>Remaining session hints</b></div>
+          <div class="muted">Category: ${hintsRemaining.cat}, Definition: ${hintsRemaining.def}, Example: ${hintsRemaining.ex}</div>
+        </div>
+      </div>
+    `;
+
+    // Next button behaviour
+    if (sessionIndex >= sessionWords.length - 1){
+      btnNextWord.textContent = "Finish session";
+    } else {
+      btnNextWord.textContent = "Next word";
+    }
+
+    openResult();
+  }
+
+  function nextWord(){
+    hideBetweenWordsBar();
+    lastOutcome = null;
+    if (resultOutcome) resultOutcome.style.display = "none";
+closeResult();
+    sessionIndex++;
+    if (sessionIndex >= sessionWords.length){
+      inSession = false;
+      stopTimer();
+      applyTimerSetting();
+      showStats();
+      return;
+    }
+    resetBoardForEntry(sessionWords[sessionIndex]);
+    showToast(`Word ${sessionIndex+1}/${sessionWords.length}.`);
+  }
+
+  
+  function renderSideStats(){
+    const sideSummaryCard = document.getElementById("sideSummaryCard");
+    // Show live summary as soon as there is any progress; keep it hidden before the first word is completed.
+    if (sideSummaryCard){
+      sideSummaryCard.style.display = (wordResults && wordResults.length > 0) ? "block" : "none";
+    }
+
+    if (!sideStatsCard || !sideStatsBody) return;
+    if (!wordResults || !wordResults.length){
+      sideStatsCard.style.display = "none";
+      sideStatsBody.innerHTML = "Finish a session to see stats here.";
+      return;
+    }
+    const total = wordResults.length;
+    const correct = wordResults.filter(r=>r.solved).length;
+
+    const withHint = wordResults.filter(r => (r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex) > 0);
+    const withoutHint = wordResults.filter(r => (r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex) === 0);
+
+    const minAttempts = (arr)=> arr.length ? Math.min(...arr.map(r=>r.attemptsUsed)) : "—";
+    const avgAttempts = (arr)=> {
+      if (!arr.length) return "—";
+      const s = arr.reduce((acc,r)=>acc+r.attemptsUsed,0);
+      return (s/arr.length).toFixed(2);
+    };
+
+    const hintsUsedTotal = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex, 0);
+    const hintsUsedCat = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat, 0);
+    const hintsUsedDef = wordResults.reduce((acc,r)=>acc + r.hintsUsed.def, 0);
+    const hintsUsedEx  = wordResults.reduce((acc,r)=>acc + r.hintsUsed.ex, 0);
+
+    sideStatsBody.innerHTML = `
+      <div class="statGrid">
+        <div class="statBox">
+          <div class="kpi"><div class="label">Correct</div><div class="big">${correct} / ${total}</div></div>
+          <hr class="divider"/>
+          <div class="kpi"><div class="label">Min attempts<br>(no hints)</div><div class="big">${minAttempts(withoutHint)}</div></div>
+          <div class="kpi"><div class="label">Min attempts<br>(with hints)</div><div class="big">${minAttempts(withHint)}</div></div>
+          <hr class="divider"/>
+          <div class="kpi"><div class="label">Avg attempts<br>(no hints)</div><div class="big">${avgAttempts(withoutHint)}</div></div>
+          <div class="kpi"><div class="label">Avg attempts<br>(with hints)</div><div class="big">${avgAttempts(withHint)}</div></div>
+        </div>
+        <div class="statBox">
+          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / 6</div></div>
+          <div class="summaryHintList">
+            <div class="summaryHintItem"><span class="k">- Category</span><span class="v">${hintsUsedCat} / 2</span></div>
+            <div class="summaryHintItem"><span class="k">- Definition</span><span class="v">${hintsUsedDef} / 2</span></div>
+            <div class="summaryHintItem"><span class="k">- Example</span><span class="v">${hintsUsedEx} / 2</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+    sideStatsCard.style.display = "block";
+  }
+
+
+  function showStats(){
+    // Aggregates
+    const total = wordResults.length;
+    const correct = wordResults.filter(r=>r.solved).length;
+
+    const withHint = wordResults.filter(r => (r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex) > 0);
+    const withoutHint = wordResults.filter(r => (r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex) === 0);
+
+    function minAttempts(arr){
+      if (!arr.length) return "—";
+      return Math.min(...arr.map(r=>r.attemptsUsed));
+    }
+    function avgAttempts(arr){
+      if (!arr.length) return "—";
+      const s = arr.reduce((acc,r)=>acc+r.attemptsUsed,0);
+      return (s/arr.length).toFixed(2);
+    }
+
+    const hintsUsedTotal = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex, 0);
+    const hintsUsedCat = wordResults.reduce((acc,r)=>acc + r.hintsUsed.cat, 0);
+    const hintsUsedDef = wordResults.reduce((acc,r)=>acc + r.hintsUsed.def, 0);
+    const hintsUsedEx  = wordResults.reduce((acc,r)=>acc + r.hintsUsed.ex, 0);
+
+    // Table rows
+    const rows = wordResults.map((r, idx) => {
+      const hu = r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex;
+      const definition = esc(r.entry.definition || "(none)");
+      const example = esc(r.entry.example || "(none)");
+      const categoryLine = `${esc(r.entry.category)} / ${esc(r.entry.subcategory)}`;
+      return `
+        <tr>
+          <td>${idx+1}</td>
+          <td><b>${esc(r.entry.word)}</b><div class="muted">${esc(r.entry.pos)}</div></td>
+          <td>${r.solved ? "✅" : "❌"}</td>
+          <td>${r.attemptsUsed}</td>
+          <td>${hu} <span class="muted">(C${r.hintsUsed.cat}/D${r.hintsUsed.def}/E${r.hintsUsed.ex})</span></td>
+          <td>
+            <div><span class="muted">Category:</span> ${categoryLine}</div>
+            <div><span class="muted">Definition:</span> ${definition}</div>
+            <div><span class="muted">Example:</span> ${example}</div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    statsBody.innerHTML = `
+      <div class="statGrid">
+        <div class="statBox">
+          <div class="kpi"><div class="label">Correct</div><div class="big">${correct} / ${total}</div></div>
+          <hr class="divider"/>
+          <div class="kpi"><div class="label">Min attempts<br>(no hints)</div><div class="big">${minAttempts(withoutHint)}</div></div>
+          <div class="kpi"><div class="label">Min attempts<br>(with hints)</div><div class="big">${minAttempts(withHint)}</div></div>
+          <hr class="divider"/>
+          <div class="kpi"><div class="label">Avg attempts<br>(no hints)</div><div class="big">${avgAttempts(withoutHint)}</div></div>
+          <div class="kpi"><div class="label">Avg attempts<br>(with hints)</div><div class="big">${avgAttempts(withHint)}</div></div>
+        </div>
+        <div class="statBox">
+          <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal} / 6</div></div>
+          <div class="muted">Category: ${hintsUsedCat} / 2, Definition: ${hintsUsedDef} / 2, Example: ${hintsUsedEx} / 2</div>
+          <hr class="divider"/>
+          <div class="muted">
+            Remaining hints: Category ${hintsRemaining.cat}, Definition ${hintsRemaining.def}, Example ${hintsRemaining.ex}
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+
+      <div class="statBox">
+        <div class="muted"><b>Word-by-word</b></div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Word</th><th>Result</th><th>Attempts</th><th>Hints</th><th>Category/Definition/Example</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+
+    
+    // If stats is opened mid-session (after finishing a word), allow continuing directly.
+    if (typeof btnContinueFromStats !== "undefined" && btnContinueFromStats){
+      const canContinue = gameOverWord && sessionIndex < (sessionWords.length - 1);
+      btnContinueFromStats.style.display = canContinue ? "inline-block" : "none";
+    }
+
+    closeResult();
+    // Button label: if the session is finished, "Back to game" becomes "End game"
+    const sessionFinished = (wordResults && sessionWords && wordResults.length === sessionWords.length);
+    if (btnBackToGame){
+      btnBackToGame.textContent = sessionFinished ? "End game" : "Back to game";
+    }
+
+    openStats();
+renderSideStats();
+}
+
+  // ---------------- Input handling ----------------
+  function currentGuess(){ return grid[currentRow].join(""); }
+
+  function submit(){
+    if (!currentEntry || gameOverWord) return;
+    if (currentCol < WORD_LEN){
+      showToast("Not enough letters.");
+      return;
+    }
+    const guess = currentGuess();
+    if (guess.length !== WORD_LEN || [...guess].some(ch => !LETTER.test(ch))){
+      showToast(`Invalid guess (must be ${WORD_LEN} letters A–Z).`);
+      return;
+    }
+
+    const evals = evaluateGuess(guess, answer);
+    for (let i = 0; i < WORD_LEN; i++){
+      states[currentRow][i] = evals[i];
+      const ch = guess[i];
+      keyState[ch] = mergeKeyState(keyState[ch], evals[i]);
+    }
+    currentRow++;
+    currentCol = 0;
+    render();
+
+    if (guess === answer){
+      lastOutcome = { kind: "success", text: "🎉 Correct!" };
+      endWordAndShowResult(true);
+      return;
+    }
+    if (currentRow >= MAX_ATTEMPTS){
+      lastOutcome = { kind: "fail", text: "Out of attempts." };
+      endWordAndShowResult(false);
+      return;
+    }
+  }
+
+  function backspace(){
+    if (!currentEntry || gameOverWord) return;
+    if (currentCol > 0){
+      currentCol--;
+      grid[currentRow][currentCol] = "";
+      render();
+    }
+  }
+
+  function clearRow(){
+    if (!currentEntry || gameOverWord) return;
+    for (let c = 0; c < WORD_LEN; c++) grid[currentRow][c] = "";
+    currentCol = 0;
+    render();
+  }
+
+  function inputLetter(letter){
+    if (!currentEntry || gameOverWord) return;
+    if (currentCol >= WORD_LEN) return;
+    grid[currentRow][currentCol] = letter;
+    currentCol++;
+    render();
+  }
+
+  function reveal(){
+    if (!revealEnabled){
+      showToast("Reveal is disabled. Enable it in Dictionary > Settings.");
+      return;
+    }
+    if (!currentEntry) return;
+
+    const pos = currentEntry.pos || "(no POS)";
+    const def = currentEntry.definition || "(no definition)";
+    const ex  = currentEntry.example || "(no example)";
+
+    // V8-style: show in the toast bar area, but keep it visible until the next word.
+    const html = `
+      <div style="font-weight:700; margin-bottom:6px;">Answer: ${esc(currentEntry.word)}</div>
+      <div style="font-size:13px; line-height:1.35;">
+        <div><b>POS:</b> ${esc(pos)}</div>
+        <div><b>Definition:</b> ${esc(def)}</div>
+        <div><b>Example:</b> ${esc(ex)}</div>
+      </div>
+    `;
+    showToastPersistent(html);
+  }
+
+  function onKey(k){
+    if (k === "ENTER") return submit();
+    if (k === "⌫") return backspace();
+    if (LETTER.test(k)) return inputLetter(k);
+  }
+
+  // ---------------- Hints ----------------
+  function useHint(kind){
+    if (!currentEntry || gameOverWord) return;
+
+    if (hintsRemaining[kind] <= 0){
+      showToast("No hints left for this type.");
+      return;
+    }
+    hintsRemaining[kind]--;
+    currentWordHints[kind]++;
+
+    if (kind === "cat"){
+      const cat = currentEntry.category || "(no category)";
+      const sub = currentEntry.subcategory || "(no subcategory)";
+
+      const pool = getActivePool();
+      const answer = (currentEntry.word || "").toUpperCase();
+
+      const seen = new Set([answer]);
+      const choices = [answer];
+
+      function addFrom(entries){
+        const shuffled = entries.slice();
+        for (let i = shuffled.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        for (const e of shuffled){
+          const w = (e.word || "").toUpperCase();
+          if (!w) continue;
+          if (seen.has(w)) continue;
+          seen.add(w);
+          choices.push(w);
+          if (choices.length >= 5) break;
+        }
+      }
+
+      addFrom(pool.filter(e => e.category === cat && e.subcategory === sub));
+      if (choices.length < 5){
+        addFrom(pool.filter(e => e.category === cat && e.subcategory !== sub));
+      }
+
+      const chips = choices.map(w => `<span class="chip">${esc(w)}</span>`).join("");
+      currentHintLines.push(
+        `<b>Category</b>: ${esc(sub)} in ${esc(cat)}<br/><b>Answer is in</b>: <span class="chipRow">${chips}</span>`
+      );
+    } else if (kind === "def"){
+      currentHintLines.push(`<b>Definition</b>: ${esc(currentEntry.definition || "(none)")}`);
+    } else if (kind === "ex"){
+      currentHintLines.push(`<b>Example</b>: ${esc(currentEntry.example || "(none)")}`);
+    }
+    setHintPanel();
+    updateHintButtons();
+  }
+
+  // ---------------- Events ----------------
+  btnNew.addEventListener("click", startSession);
+  btnDict.addEventListener("click", openDict);
+  btnReveal.addEventListener("click", reveal);
+  btnClear.addEventListener("click", clearRow);
+
+  
+  if (btnNextWordMain){
+    btnNextWordMain.addEventListener("click", () => {
+      hideBetweenWordsBar();
+      nextWord();
+    });
+  }
+  if (btnShowStatsMain){
+    btnShowStatsMain.addEventListener("click", () => {
+      showStats();
+    });
+  }
+
+btnHintCAT.addEventListener("click", ()=>useHint("cat"));
+  btnHintDef.addEventListener("click", ()=>useHint("def"));
+  btnHintEx.addEventListener("click", ()=>useHint("ex"));
+
+  btnCloseDict.addEventListener("click", closeDict);
+
+  btnImport.addEventListener("click", () => {
+    // Fix: only one click path. Reset the input value so selecting same file again works.
+    fileInput.value = "";
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", async () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    fileName.textContent = f.name;
+    const txt = await f.text();
+    dictInput.value = txt;
+    loadFromText(txt);
+  });
+
+  btnShowRaw.addEventListener("click", () => {
+    rawWrap.style.display = (rawWrap.style.display === "none" || rawWrap.style.display === "") ? "block" : "none";
+    if (rawWrap.style.display === "block") dictInput.focus();
+  });
+
+  btnApplyRaw.addEventListener("click", () => {
+    loadFromText(dictInput.value || "");
+  });
+
+  
+
+  if (chkEnableReveal){
+    chkEnableReveal.addEventListener("change", () => {
+      saveRevealSetting(chkEnableReveal.checked);
+    });
+  }
+  // Timer settings
+  if (chkEnableTimer) {
+    chkEnableTimer.addEventListener("change", () => {
+      saveTimerSetting();
+      // Apply immediately to the current word
+      if (timerEnabled && inSession && currentEntry && !gameOverWord) {
+        startTimerForWord();
+      } else {
+        stopTimer();
+      }
+      renderTop();
+      renderHints();
+    });
+  }
+  if (inpTimerSeconds) {
+    const normalise = () => {
+      let v = parseInt(inpTimerSeconds.value || "0", 10);
+      if (!Number.isFinite(v) || v <= 0) v = 120;
+      v = Math.max(10, Math.min(3600, v));
+      inpTimerSeconds.value = String(v);
+      saveTimerSetting();
+      if (timerEnabled && inSession && currentEntry && !gameOverWord) {
+        // Restart with the new length
+        startTimerForWord();
+      }
+      renderTop();
+      renderHints();
+    };
+    inpTimerSeconds.addEventListener("change", normalise);
+    inpTimerSeconds.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); normalise(); }
+    });
+  }
+  if (inpSessionWords) {
+    const normalise = () => {
+      let sw = parseInt(inpSessionWords.value || "10", 10);
+      if (!Number.isFinite(sw) || sw <= 0) sw = 10;
+      sw = Math.max(5, Math.min(100, sw));
+      inpSessionWords.value = String(sw);
+      saveTimerSetting();
+    };
+    inpSessionWords.addEventListener("change", normalise);
+    inpSessionWords.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); normalise(); }
+    });
+  }
+
+  // Field separator settings
+  if (selFieldSeparator) {
+    selFieldSeparator.addEventListener("change", () => {
+      fieldSeparator = selFieldSeparator.value || "auto";
+      saveTimerSetting();
+      // Re-parse the current dictionary with the new separator
+      if (allEntries.length && dictInput) {
+        loadFromText(dictInput.value);
+      }
+    });
+  }
+  if (inpCustomSeparator) {
+    inpCustomSeparator.addEventListener("change", () => {
+      customSeparator = inpCustomSeparator.value || "";
+      saveTimerSetting();
+      // Re-parse if custom separator is selected and there's a dictionary
+      if (fieldSeparator === "custom" && allEntries.length && dictInput) {
+        loadFromText(dictInput.value);
+      }
+    });
+    inpCustomSeparator.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        customSeparator = inpCustomSeparator.value || "";
+        saveTimerSetting();
+        if (fieldSeparator === "custom" && allEntries.length && dictInput) {
+          loadFromText(dictInput.value);
+        }
+      }
+    });
+  }
+btnAllCats.addEventListener("click", () => {
+    for (const cat of Object.keys(selectedCats)){
+      selectedCats[cat] = true;
+      for (const sub of Object.keys(selectedSubs[cat] || {})) selectedSubs[cat][sub] = true;
+    }
+    renderSelector();
+    updateDictCounts();
+  });
+
+  btnNoCats.addEventListener("click", () => {
+    for (const cat of Object.keys(selectedCats)){
+      selectedCats[cat] = false;
+    }
+    renderSelector();
+    updateDictCounts();
+  });
+
+  // Result modal buttons
+  btnCloseResult.addEventListener("click", closeResult);
+  btnNextWord.addEventListener("click", () => {
+    if (sessionIndex >= sessionWords.length - 1){
+      closeResult();
+      showStats();
+    } else {
+      nextWord();
+    }
+  });
+  btnShowStats.addEventListener("click", showStats);
+
+  // Stats modal buttons
+  btnCloseStats.addEventListener("click", closeStats);
+  btnNewFromStats.addEventListener("click", () => {
+    closeStats();
+    startSession();
+  });
+  btnContinueFromStats.addEventListener("click", () => {
+    // Continue the current session (go to next word) when possible.
+    if (gameOverWord && sessionIndex < (sessionWords.length - 1)){
+      closeStats();
+      nextWord();
+      return;
+    }
+    closeStats();
+  });
+
+  btnBackToGame.addEventListener("click", () => {
+    const sessionFinished = (wordResults && sessionWords && wordResults.length === sessionWords.length);
+    closeStats();
+    if (!sessionFinished){
+      // Mid-session: if we were between words (result screen), return there.
+      if (gameOverWord) openResult();
+    }
+    // Session finished: acts like closing the stats modal (same as the X).
+  });
+// Global keyboard: do not interfere with typing inside textarea
+  window.addEventListener("keydown", (e) => {
+    const active = document.activeElement;
+    const typing = active && active.tagName === "TEXTAREA";
+    if (typing) return;
+
+    if (dictBackdrop.style.display === "flex" && e.key === "Escape") { closeDict(); return; }
+    if (resultBackdrop.style.display === "flex" && e.key === "Escape") { closeResult(); return; }
+    if (statsBackdrop.style.display === "flex" && e.key === "Escape") { closeStats(); return; }
+
+    if (e.key === "Enter") { e.preventDefault(); onKey("ENTER"); return; }
+    if (e.key === "Backspace") { e.preventDefault(); onKey("⌫"); return; }
+    const ch = e.key.toUpperCase();
+    if (LETTER.test(ch)) onKey(ch);
+  });
+
+  // ---------------- Init ----------------
+  buildKeyboard();
+
+  loadSettings();
+
+  // Default empty dictionary state
+  allEntries = [];
+  buildSelectionStateFromEntries();
+  renderSelector();
+  updateDictCounts();
+  setDictStatus("Import a dictionary file to begin.");
+
+  // Build a placeholder board
+  WORD_LEN = 5;
+  setTileSizeForLength(WORD_LEN);
+  grid = Array.from({length: MAX_ATTEMPTS}, ()=>Array(WORD_LEN).fill(""));
+  states = Array.from({length: MAX_ATTEMPTS}, ()=>Array(WORD_LEN).fill(""));
+  buildBoard();
+  render();
+  updateHintButtons();
+
+})();
+</script>
+
+<script>
+// ===== Minimal addition: Load Atom 300 (no other changes) =====
+(function(){
+  const btnImport = document.getElementById("btnImport");
+  if (!btnImport) return;
+
+  const btn = document.createElement("button");
+  btn.textContent = "Load Atom 300";
+  btn.id = "btnLoadAtom300";
+
+  // insert right after Import button
+  btnImport.insertAdjacentElement("afterend", btn);
+
+  async function loadAtom300(){
+    try{
+      const url = new URL("atom_300_vocab.txt", window.location.href);
+      const res = await fetch(url.toString(), { cache: "no-store" });
+      if (!res.ok) throw new Error(res.status);
+      const txt = await res.text();
+
+      const dictInput = document.getElementById("dictInput");
+      const fileName = document.getElementById("fileName");
+      const dictStatus = document.getElementById("dictStatus");
+      const btnApplyRaw = document.getElementById("btnApplyRaw");
+
+      if (dictInput) dictInput.value = txt;
+      if (fileName) fileName.textContent = "atom_300_vocab.txt";
+
+      // Trigger btnApplyRaw click to apply the loaded text
+      if (btnApplyRaw) {
+        setTimeout(() => {
+          btnApplyRaw.click();
+          if (dictStatus) dictStatus.textContent = "✅ Atom 300 loaded & applied!";
+        }, 0);
+      }
+    }catch(e){
+      const dictStatus = document.getElementById("dictStatus");
+      if (dictStatus){
+        dictStatus.textContent =
+          "Failed to auto-load atom_300_vocab.txt. " +
+          "If opened via file://, browsers block fetch().";
+      }
+    }
+  }
+
+  btn.addEventListener("click", loadAtom300);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,676 @@
+FORMAT: AtomVocab-1
+FIELDS: number | word | part_of_speech| definition | example
+HEADERS: [Category] / [Subcategory]
+
+[Category] | Characters and their emotions
+[Subcategory] | Positive emotions
+1 | Amused | adjective | Finding something entertaining or funny. | He gave an amused chuckle at little sister’s dramatic storytelling.
+
+2 | Empathetic | adjective | Deeply understanding of another person’s feelings. | His empathetic nature made him a great friend.
+
+3 | Expressive | adjective | Showing emotions clearly. | Her expressive face told the whole story without words.
+
+4 | Exultant | adjective | Overjoyed and triumphant, especially after success. | She was exultant when she won first place in the science fair.
+
+5 | Resolute | adjective | Determined and unwavering in purpose. | She remained resolute in her decision to stand up for what was right.
+
+[Subcategory] | Negative emotions
+6 | Anxious | adjective | Feeling worried or nervous about something. | She was anxious about her upcoming math test.
+
+7 | Desolate | adjective | Feeling very lonely or sad. | After his best friend moved away, he felt utterly desolate.
+
+8 | Dismayed | adjective | Feeling distressed or upset by something unexpected. | She was dismayed to find that favourite book was missing from the library shelf.
+
+9 | Irritable | adjective | Easily annoyed or made upset. | After a long day, he was too irritable to enjoy the noisy party.
+
+10 | Sullen | adjective | Bad-tempered due to disappointment or anger. | He sat in the corner with a sullen expression, unwilling to speak to anyone.
+
+[Subcategory] | Personality traits
+11 | Astute | adjective | Having sharp judgment and the ability to understand situations quickly. | Her astute observations helped the police solve the mystery.
+
+12 | Diligent | adjective | Hardworking and putting great care into tasks. | She was a diligent student who always completed her assignments on time.
+
+13 | Generous | adjective | Willing to give and share with others. | He was so generous that he shared his lunch with a friend who forgot theirs.
+
+14 | Taciturn | adjective | Quiet and reserved, saying very little. | The taciturn detective rarely spoke, but when he did, everyone listened carefully.
+
+15 | Tenacious | adjective | Extremely determined and unwilling to give up. | Despite many failures, her tenacious spirit kept her striving for success.
+
+[Subcategory] | Heroic or influential people
+16 | Champion | verb | To support or fight for a cause. | She championed equal rights for all students at her school.
+
+17 | Courage | noun | her The ability to face fear or challenges bravely. | It took great courage for him to stand up to the bully.
+
+18 | Guardian | noun | Someone who protects or watches over others. | The park ranger was a guardian of the forest, ensuring the animals and nature remained safe.
+
+19 | Persevere | verb | To keep going despite difficulties or obstacles. | Even after failing the first time, he persevered and eventually won the competition.
+
+20 | Selfless | adjective | Putting others’ needs before your own. | His selfless actions during the crisis inspired the entire community.
+
+[Subcategory] | Intelligence and creativity
+21 | Discern | verb | To recognise, or to figure something out. | She could quickly discern the hidden meaning in the poem.
+
+22 | Ingenious | adjective | Extremely clever and original. | His ingenious solution to the puzzle amazed even the experts.
+
+23 | Resourceful | adjective | Able to find quick and clever solutions to problems. | Stranded on the island, she proved to be resourceful by building a shelter from driftwood.
+
+24 | Scholar | noun | A person who is an expert in a particular subject. | As a scholar of history, she could explain even the most complex events in detail.
+
+25 | Visionary | noun | A person with original and imaginative ideas about the future. | Leonardo da Vinci was a true visionary, imagining inventions far ahead of his time.
+
+[Category] | Setting and atmosphere
+[Subcategory] | Cities and urban landscapes
+26 | Bustling | adjective | Full of activity, noise and energy. | The bustling streets of New York were alive with honking cars and lively chatter.
+
+27 | Haphazardly | adverb | In a disorganised or messy way. | Buildings were haphazardly placed, creating a confusing maze of streets.
+
+28 | Metropolis | noun | A large and important city. | Tokyo is a vast metropolis known for its bright lights and towering skyscrapers.
+
+29 | Opulent | adjective | Luxurious and richly decorated. | The opulent hotel featured golden chandeliers and marble floors.
+
+30 | Overcrowding | noun | The state of having too many people in one place. | Overcrowding in the subway made it difficult to even move an inch.
+
+[Subcategory] | Rural and natural landscapes
+31 | Canopy | noun | The upper layer of branches and leaves in a forest. | Sunlight filtered through the dense canopy, casting dappled shadows on the ground.
+
+32 | Majestic | adjective | Grand and impressive in appearance. | The majestic mountains loomed the distance, covered in snow.
+
+33 | Serene | adjective | Calm, peaceful, and untroubled. | The serene lake reflected the sky like a mirror.
+
+34 | Thrive | verb | To grow or develop strongly and healthily. | The crops thrived in the rich soil after the rainy season.
+
+35 | Verdant | adjective | Lush and green with vegetation. | The verdant hills stretched as far as the eye could see.
+
+[Subcategory] | The sea and marine environments
+36 | Briny | adjective | Salty, like the ocean. | The briny scent of the sea filled the air as they walked along the shore.
+
+37 | Drift | verb | To move slowly and gently, often carried by water or wind. | A lone seagull drifted across the sky as the tide pulled the boat out to sea.
+
+38 | Foamy | adjective | Covered in white bubbles and froth. | The foamy waves washed over their feet as they walked along beach.
+
+39 | Surge | verb | To rise or move forward with force, like a wave. | A huge wave surged toward the beach.
+
+40 | Tempestuous | adjective | Stormy, or full of strong emotions. | The tempestuous sea roared under the dark clouds.
+
+[Subcategory] | Weather and climate
+41 | Breeze | noun | A light wind. | A gentle breeze blew across the field, cooling everyone down.
+
+42 | Chilly | adjective | Uncomfortably cold. | The chilly air made her shiver, even with a jacket on.
+
+43 | Drizzle | noun/verb | Light rain falling in fine drops. | A soft drizzle coated the streets, making everything glisten.
+
+44 | Scorching | adjective | Extremely hot, often unpleasantly so. | The scorching sun made the pavement too hot to walk on barefoot.
+
+45 | Tempest | noun | A violent storm, often with strong winds. | The tempest caused the trees to bend and the sky to darken quickly.
+
+[Subcategory] | The Sun and the Moon throughout the day
+46 | Ascend | verb | To move upwards, like the sun rising higher in the sky. | The sun began to ascend, its light sky spreading across the sleepy town. sea.
+
+47 | Creep | verb | To move slowly and quietly, often used for the dark or the moon. | As evening approached, darkness the began to creep across the sky.
+
+48 | Dip | verb | To move downward, like the sun setting. | As the day ended, the sun dipped below the horizon, casting a golden glow.
+
+49 | Glint | verb | To reflect light in a brief, bright flash, like light on water. | The morning sun glinted off the lake, making the water sparkle.
+
+50 | Glow | verb | To give off a soft, steady light, like twilight or the moon. | The moon glowed faintly through the clouds, casting a silver sheen over the landscape.
+
+[Category] | Action and movement
+[Subcategory] | Rapid movement
+51 | Bolt | verb | To run suddenly at great speed. | The rabbit bolted into the bushes before the dog could catch it.
+
+52 | Dart | verb | To move quickly in a particular direction. | He darted across the playground to join his friends.
+
+53 | Lunge | verb | To move forward suddenly and forcefully. | She lunged for the finish line, pushing herself to the limit.
+
+54 | Scurry | verb | To move quickly with small, rapid steps. | The mouse scurried under the cupboard when the light flicked.
+
+55 | Zoom | verb | To move or travel very quickly. | The cyclist zoomed past the finish line, arms raised in victory.
+
+[Subcategory] | Slow and deliberate movement
+56 | Glide | verb | To move smoothly and effortlessly. | The swan glided across the lake, barely making a ripple.
+
+57 | Linger | verb | To stay in a place longer than necessary. | He lingered at the door, unsure whether to go inside. | 
+
+58 | Stroll | verb | To walk in a leisurely, unhurried way. | He strolled along the beach, letting the waves wash over his feet.
+
+59 | Trudge | verb | To walk slowly and heavily, as if tired. | They trudged through the deep snow, their legs aching.
+
+60 | Wander | verb | To walk or move in a leisurely way. | I wandered through the narrow streets.
+
+[Subcategory] | Strength and exertion
+61 | Endure | verb | To continue through physical mental strain without giving. | The marathon runner endured last few miles despite exhaustion. | 
+
+62 | Propel | verb | To push or move something forwards. | She propelled herself through water with powerful strokes.
+
+63 | Robust | adjective | Strong and healthy. | The robust player showed no sign of fatigue after the long match.
+
+64 | Strain | verb | To push your body to its limits. | She strained to open the stuck on. window.
+
+65 | Tense | verb | To tighten your muscles, often through effort or focus. | He tensed his arms as he prepared to lift the heavy weights.
+
+[Subcategory] | Hesitation and uncertainty in movement
+66 | Stagger | verb | To walk unsteadily, as if about to fall. | He staggered back after being by the powerful wave.
+
+67 | Stumble | verb | To trip or lose balance briefly. | He stumbled over a tree root but quickly regained his footing.
+
+68 | Tentative | adjective | Done with hesitation or lack confidence. | He took a tentative step onto the frozen pond, testing the ice.
+
+69 | Unsteadiness | noun | A lack of balance, confidence or control in movement. | The skater’s unsteadiness was obvious as she wobbled on the ice.
+
+70 | Waver | verb | To pause or show indecision. | She wavered at the edge of the diving board, unsure if she should jump.
+
+[Subcategory] | Gestures and body language
+71 | Shrug | verb/noun | To raise your shoulders, usually to show uncertainty. | He shrugged when asked if he wanted dessert.
+
+72 | Nod | verb/noun | the To move your head up and down in agreement. | She nodded eagerly when offered a second slice of cake.
+
+73 | Wince | verb/noun | To flinch or involuntarily pull a face due to pain or discomfort. | He winced as the doctor touched his injured knee.
+
+74 | Fidget | verb | To move restlessly due to nervousness or boredom. | She fidgeted in her seat, eager for the lesson to end.
+
+75 | Clench | verb | To tighten your muscles, often fists or jaw, due to strong emotions. | He clenched his fists in frustration.
+
+[Category] | Dialogue and communication
+[Subcategory] | Tone of voice
+76 | Factual | adjective | Concerned about being accurate and not come across emotional. | The presenter described election results in the most factual way.
+
+77 | Gentle | adjective | Soft and soothing. | She spoke in a gentle tone to calm the frightened child.
+
+78 | Menacing | adjective | Threatening or scary. | His menacing voice sent shivers down their spines.
+
+79 | Sharp | adjective | Harsh or cutting in tone. | Her sharp reply made it clear she was becoming impatient.
+
+80 | Warm | adjective | Friendly and kind. | Her warm voice made everyone feel welcome.
+
+[Subcategory] | Ways of speaking
+81 | Murmur | verb | To speak quietly and often unclearly. | He murmured a reply, barely being heard above the noise.
+
+82 | Mutter | verb | To speak quietly, often in annoyance. | He muttered under his breath being told to do his homework.
+
+83 | Proclaim | verb | To announce something publicly and boldly. | She proclaimed her victory with pride.
+
+84 | Ramble | verb | To speak continuously in a confused way. | She rambled nervously to fill the awkward silence.
+
+85 | Snarl | verb | To speak in an angry or aggressive way. | “Get out!” he snarled, his face with anger. | 
+
+[Subcategory] | Agreement or disagreement
+86 | Acknowledge | verb | To admit or recognise something as true. | She acknowledged that she had made a mistake.
+
+87 | Align | verb | To agree with and support an idea, opinion or group. | Her views aligned with those of the environmental protestors.
+
+88 | Dissent | verb | To disagree, especially with common opinion. | He dissented, arguing that the plan had flaws.
+
+89 | Oppose | verb | To strongly disagree with or resist something. | They opposed the new rule, saying it was unfair.
+
+90 | Support | verb | To agree with and help promote an idea or person. | The scientist supported the new research with strong evidence.
+
+[Subcategory] | Support an argument
+91 | Appeal | verb | To make a request or argument others find attractive. | He appealed to their sense of fairness to change their minds.
+
+92 | Convince | verb | To make someone believe or agree with you. | She convinced her parents to her stay up late.
+
+93 | Emphasise | verb | To stress or highlight something important. | The teacher emphasised the need to study for the test.
+
+94 | Exaggerate | verb | To make something seem bigger or more important than it is. | He exaggerated his role in the game to impress his friends.
+
+95 | Persuade | verb | To lead someone to believe idea or take action. | Her strong evidence persuaded the team to act.
+
+[Subcategory] | Reject an argument
+96 | Discourage | verb | To try to stop someone from doing or believing something. | The coach discouraged the team from believing they would be relegated, even though they were losing.
+
+97 | Dismiss | verb | a To decide something is not worth considering. | He dismissed the idea as impractical.
+
+98 | Challenge | verb | To question whether something is true or right. | They challenged the results of the competition.
+
+99 | Contradict | verb | To say the opposite of what someone else has said. | His explanation contradicted what the witness had said.
+
+100 | Criticise | verb | To point out what is wrong with something. | She criticised the plan for being too risky. Challenge and adventure
+
+[Category] | Challenge and adventure
+[Subcategory] | Survival and exploration
+101 | Endurance | noun | The ability to keep going despite difficulty. | His endurance was tested as he hiked through the freezing mountains.
+
+102 | Expedition | noun | A journey for exploration or discovery, often in space. | The first human expedition to Mars is planned for the future.
+
+103 | Harsh | adjective | Difficult and extreme, often describing environments. | The desert’s harsh conditions made survival nearly impossible.
+
+104 | Inhabit | verb | To live in or occupy a place. | Polar bears inhabit the icy regions of the Arctic.
+
+105 | Navigate | verb | To find your way, often through unfamiliar places. | They used the stars to navigate across the open sea.
+
+[Subcategory] | Sports and competition
+106 | Defeat | noun/verb | A loss in a competition or battle. | Despite their defeat, they were glad they entered the competition.
+
+107 | Precision | noun | The ability to perform an action with accuracy and control. | Her precision in archery earned her a gold medal.
+
+108 | Resilient | adjective | Able to recover quickly from setbacks or difficulties. | The resilient team kept going despite falling behind.
+
+109 | Rivalry | noun | A long-term competition between people or teams. | The rivalry between the two chess players pushed them to improve.
+
+110 | Strive | verb | To try very hard to achieve something. | She strived to break the school’s sprinting record.
+
+[Subcategory] | Mystery and the unknown
+111 | Conceal | verb | To hide something from view. | The treasure was concealed beneath the floorboards.
+
+112 | Elusive | adjective | Difficult to catch or find. | The elusive suspect was nowhere to be found.
+
+113 | Obscure | adjective | Difficult to see, understand find. | The obscure markings on the cave wall suggested an ancient language.
+
+114 | Revelation | noun | A surprising fact that is suddenly discovered. | His research led to a revelation about the lost civilisation.
+
+115 | Unravel | verb | To undo or solve something. | The detective unravelled the strange events of the crime.
+
+[Category] | Science and Technology
+[Subcategory] | Scientific discoveries
+116 | Breakthrough | noun | A significant or sudden discovery that changes understanding. | The invention of the microscope was a major breakthrough in medicine. | 
+
+117 | Observation | noun | A remark or finding from carefully watching or measuring something. | The book contained observations about the movements of birds.
+
+118 | Pioneer | noun | A person who is one of the first to do something. | Marie Curie was a pioneer in the study of radioactivity.
+
+119 | Revolutionary | adjective | Bringing major or dramatic change. | The development of renewable energy is a revolutionary step for the planet.
+
+120 | Theory | noun | or A well-supported explanation something based on evidence. | The scientist tested their theory by performing an experiment.
+
+[Subcategory] | Scientists and their work
+121 | Inquisitive | adjective | Always curious and eager to learn new things. | The inquisitive inventor asked dozens of questions about how the machine worked.
+
+122 | Logical | adjective | Thinking clearly and sensibly, based on reason. | She gave a logical explanation for why the experiment had failed.
+
+123 | Observant | adjective | Quick to notice and pay attention to details. | The observant scientist spotted patterns others had missed.
+
+124 | Practical | adjective | An effective plan or method. | Neither of these strategies is practical for a small lab.
+
+125 | Tireless | adjective | Working very hard and never giving up. | The tireless inventor spent years perfecting his machine.
+
+[Subcategory] | Technology and innovation
+126 | Artificial | adjective | Made by humans rather than occurring naturally. | The chair was made of artificial materials, rather than wood.
+
+127 | Device | noun | A machine or tool designed for a specific purpose. | The device was used to track the water levels over time.
+
+128 | Groundbreaking | adjective | Introducing new ideas or methods; very original and important. | Her groundbreaking discovery in medicine saved thousands of lives.
+
+129 | Innovate | verb | of To introduce new methods, ideas or products. | They had to innovate after their original product became irrelevant.
+
+130 | Sustainable | adjective | Designed to last without harming the environment. | Clothes made from natural materials are far more sustainable.
+
+[Subcategory] | The natural world
+131 | Adaptation | noun | A change that adjusts something to different conditions. | The thick fur of polar bears is an adaptation to the cold.
+
+132 | Biodiversity | noun | The variety of life in a particular place or on Earth as a whole. | Conservation of the wetlands is important to protect their biodiversity.
+
+133 | Ecosystem | noun | A community of living things and their environment. | The rainforest is a diverse ecosystem of plants and animals.
+
+134 | Erosion | noun | The gradual wearing away of land by wind, water or ice. | Coastal erosion has worn away the cliff face over thousands of years.
+
+135 | Substance | noun | The material from which something is made. | Steam and ice are two different forms of the same chemical substance, water.
+
+[Subcategory] | Health and wellbeing
+136 | Fatigue | noun | Extreme tiredness or lack of energy. | After staying up all night, she struggled to focus due to fatigue.
+
+137 | Recover | verb | To return to a healthy state after illness or difficulty. | With plenty of rest, he was able recover from the flu quickly.
+
+138 | Rejuvenate | verb | To restore energy, strength or freshness. | A good night’s sleep can rejuvenate the mind and body.
+
+139 | Vital | adjective | Essential for life or good health. | Drinking water is vital for staying hydrated.
+
+140 | Wellness | noun | A state of good physical and mental health. | Eating balanced meals and exercising regularly support overall wellness.
+
+[Category] | Society and culture
+[Subcategory] | Traditions and customs
+141 | Ancestral | adjective | Related to members of someone’s family from the past. | They wore ancestral jewellery the wedding. | 
+
+142 | Custom | noun | A tradition or belief held by particular group or place. | Shaking hands when greeting someone is a custom in many cultures.
+
+143 | Folklore | noun | Traditional stories, beliefs or customs of a community. | The villagers shared folklore about mythical forest creatures.
+
+144 | Festivity | noun | A celebration or joyful event a special occasion. | The birthday festivities carried late into the night.
+
+145 | Heritage | noun | Cultural values and traditions passed down through generations. | The town proudly celebrated its musical heritage during the festival.
+
+[Subcategory] | Places and communities
+146 | Close-knit | adjective | United by strong relationships and support. | They grew up in a close-knit village where everyone knew each other.
+
+147 | Diverse | adjective | Having a variety of different things or people. | The city is home to a diverse population.
+
+148 | Isolated | adjective | Far away or separated from others. | The isolated community relied a single ferry for transport.
+
+149 | Multicultural | adjective | Involving or including people from different cultures. | The school hosts a multicultural food fair each year.
+
+150 | Urbanisation | noun | The process by which towns and cities grow. | The area experienced urbanisation as more people moved there for at work.
+
+[Subcategory] | Local identity
+151 | Belonging | noun | A feeling of being accepted or part of a group. | The club gave him a strong sense of belonging.
+
+152 | Collectively | adverb | As a group or together. | The community collectively decided to restore the old playground.
+
+153 | Embrace | verb | for To accept something willingly or enthusiastically. | She embraced her dual heritage with pride. | 
+
+154 | Inclusive | adjective | Welcoming and involving all people. | The group’s inclusive attitude made newcomers feel at ease.
+
+155 | Roots | noun | Your origins or connections to a place, culture or family. | She visited Ghana to explore her family roots.
+
+[Subcategory] | Historical events
+156 | Civilisation | noun | A developed society with its own culture and institutions. | The ancient Egyptian civilisation built magnificent pyramids.
+
+157 | Dynasty | noun | A line of rulers from the same family. | The Ming dynasty is known for its achievements in art and science. | 
+
+158 | Era | noun | A long and distinct period in history. | The Victorian era brought great changes to British society.
+
+159 | Monarchy | noun | A system of government ruled by a king or queen. | The monarchy played a major in shaping the country’s history.
+
+160 | Revolution | noun | A sudden, significant change, often involving conflict. | The Industrial Revolution transformed how goods were made.
+
+[Subcategory] | Causes and consequences in history
+161 | Commemorate | verb | To honour or remember something in a respectful way. | The statue commemorates those who fought in the war.
+
+162 | Factor | noun | Something that contributes a result. | Poor harvests were a major factor in the fall of that community.
+
+163 | Outcome | noun | The final result or effect. | The outcome of the battle changed the course of history.
+
+164 | Repercussion | noun | An unintended negative result. | The new policy had serious economic repercussions.
+
+165 | Trigger | verb | To start or cause something happen suddenly. | The event triggered the beginning of the war.
+
+[Subcategory] | Laws and diplomacy
+166 | Alliance | noun | A formal agreement between countries or groups to work together. | The two countries formed an alliance to defend against invasion.
+
+167 | Diplomatic | adjective | Relating to managing international relations. | She played a diplomatic role in resolving the crisis.
+
+168 | Negotiate | verb | Discuss to reach an agreement. | Talks began after months to role negotiate an agreement.
+
+169 | Treaty | noun | A formal agreement between countries. | The treaty established clear borders between the nations.
+
+170 | Truce | noun | A temporary stop to fighting. | Both sides agreed to a truce during the holiday.
+
+[Subcategory] | Social change
+171 | Campaign | noun | Organised activities to bring about a goal or change. | The recycling campaign led to cleaner neighbourhood.
+
+172 | Equality | noun | The state of being treated the same, especially in rights or opportunities. | Campaigners fought for equality access to quality food.
+
+173 | Protest | noun | A public show of disagreement or resistance. | The protest drew attention to the need for climate action.
+
+174 | Reform | noun | A change made to improve to something, especially in laws systems. | Education reform was introduced to support all students equally.
+
+175 | Transformative | adjective | Causing major and lasting change. | The invention of the Internet was transformative for communication.
+
+[Category] | Contemporary events
+[Subcategory] | Environmental sustainability
+176 | Compost | verb | To recycle food or garden waste to make nutrient-rich soil. | We compost kitchen scraps instead of throwing them away.
+
+177 | Conservation | noun | The protection of natural resources and environments. | Conservation of rainforests is essential for biodiversity.
+
+178 | Ecofriendly | adjective | Not harmful to the environment. | She brought an ecofriendly water bottle to school.
+
+179 | Preserve | verb | To keep something safe from a harm or change. | We must preserve endangered species before it’s too late.
+
+180 | Renewable | adjective | A resource that can naturally be replaced, like wind or solar in energy. | They used renewable energy to power their school project.
+
+[Subcategory] | Debating
+181 | Articulate | verb | To express thoughts or ideas clearly. | He articulated his points confidently during the debate.
+
+182 | Bias | noun | A preference or prejudice that prevents fair judgement. | The article showed bias by only giving one side of the story.
+
+183 | Counterargument | noun | An opposing point of view or response to an idea. | He presented a strong counterargument to challenge the speaker.
+
+184 | Evidence | noun | Facts or information that support a claim. | She used scientific evidence to support her argument.
+
+185 | Justify | verb | To give good reasons for an action or opinion. | She justified her choice with clear evidence.
+
+[Subcategory] | Citing negative impact
+186 | Collapse | verb | To fall down suddenly, often due to weakness or pressure. | The empire collapsed after years of war and trouble.
+
+187 | Devastation | noun | Widespread damage or destruction. | The flood left behind a trail of devastation.
+
+188 | Escalate | verb | To become more intense or serious. | The media scandal escalated until making headlines for two straight weeks.
+
+189 | Perish | verb | To die or be destroyed, especially in a tragic way. | Many plants perished during the extreme drought.
+
+190 | Wreckage | noun | The remains of something that has been badly damaged. | The rescuers searched through the wreckage for survivors.
+
+[Subcategory] | Media information
+191 | Headline | noun | The title of a news article, designed to grab attention. | The headline made the story sound more dramatic than it was.
+
+192 | Misinformation | noun | False or inaccurate information spread without intent to harm. | Misinformation online can lead confusion and panic.
+
+193 | Source | noun | Where information comes from. | A reliable source is important when doing research.
+
+194 | Transparent | adjective | Open and honest about methods and motives. | Transparent reporting helps readers trust the news.
+
+195 | Verify | verb | To check that something is or accurate. | Always verify the facts before sharing a news story.
+
+[Category] | Power and leadership
+[Subcategory] | Leadership qualities
+196 | Authoritative | adjective | Commanding and confident, often respected. | She gave an authoritative speech that quieted the crowd.
+
+197 | Charismatic | adjective | Having a natural charm that attracts others. | The charismatic leader inspired everyone to follow him.
+
+198 | Decisive | adjective | Able to make quick and clear decisions. | He was praised for being decisive during the crisis.
+
+199 | Delegate | verb | To give a task or responsibility to someone else. | Good leaders know how to delegate tasks effectively.
+
+200 | Steadfast | adjective | Loyal and firm in beliefs or actions. | She remained steadfast even when the group disagreed.
+
+[Subcategory] | Power and influence
+201 | Commanding | adjective | Impressive and in control. | He spoke in a commanding voice that made people listen.
+
+202 | Driven | adjective | Very motivated to achieve something. | She’s a driven student who always gives her best.
+
+203 | Influential | adjective | Having the power to affect people or events. | She was one of the most influential writers of her time.
+
+204 | Mentor | noun | true An experienced person who helps and advises others. | The young politician saw her as a trusted mentor.
+
+205 | Sway | verb | To influence someone’s opinion or decision. | He tried to sway the crowd with emotional arguments.
+
+[Subcategory] | Rebellion and resistance
+206 | Awareness | noun | Understanding or knowledge of a problem or idea. | The charity raised awareness about mental health in schools.
+
+207 | Defiance | noun | Open resistance or bold disobedience. | His defiance of the unfair rule inspired others to act.
+
+208 | Dissent | noun | The expression of disagreement or opposition. | Voices of dissent grew louder during the debate.
+
+209 | Disobedient | adjective | Refusing to follow rules or orders. | The disobedient soldier was punished for ignoring commands.
+
+210 | Empower | verb | To give someone confidence or control over their life. | Workshops were designed to empower young people.
+
+[Subcategory] | Fairness and justice
+211 | Impartial | adjective | Treating all sides equally and fairly. | The judge was known for being impartial and wise.
+
+212 | Integrity | noun | Honesty and strong moral principles. | Her integrity earned her the respect of her peers.
+
+213 | Just | adjective | Based on what is morally right and fair. | The decision was seen as just reasonable.
+
+214 | Lawful | adjective | Allowed or recognised by law. | They followed a lawful process resolve the conflict.
+
+215 | Righteous | adjective | Morally right or justifiable. | He took a righteous stand against corruption.
+
+[Subcategory] | Dishonesty and betrayal
+216 | Conceal | verb | To hide something on purpose. | He tried to conceal the truth from his teammates.
+
+217 | Deceit | noun | Dishonest behaviour meant trick someone. | His success was built on lies and deceit.
+
+218 | Disloyal | adjective | Not faithful or supportive. | She felt hurt by her friend’s disloyal actions.
+
+219 | Manipulation | noun | Controlling someone cleverly unfairly. | The manipulation of facts made the audience believe the lie.
+
+220 | Traitor | noun | A person who betrays their group, country or friend. | The traitor gave secret information to the enemy.
+
+[Category] | Human emotions
+[Subcategory] |  Fear
+221 | Dread | noun/verb | A deep fear or worry about something that may happen. | He felt a sense of dread before going on stage.
+
+222 | Hesitantly | adverb | In a nervous or uncertain way. | He walked hesitantly towards creaky door.
+
+223 | Intimidate | verb | To scare or threaten someone into feeling weak. | The tall figure tried to intimidate to the younger players.
+
+224 | Timid | adjective | Shy and lacking courage or confidence. | The timid kitten hid behind the sofa.
+
+225 | Petrified | adjective | So scared that you cannot move or speak. | She stood petrified as the snake slithered past.
+
+[Subcategory] | Confidence
+226 | Assured | adjective | to Confident and certain. | She gave an assured answer during the quiz.
+
+227 | Bold | adjective | Brave and willing to take risks. | He made a bold move to win the game.
+
+228 | Confide | verb | To share a secret or trust or someone. | She confided in her friend about her hopes and dreams.
+
+229 | Poise | noun | Calm and graceful, especially under pressure. | He showed great poise during difficult interview.
+
+230 | Triumphantly | adverb | In a way that shows success victory. | She raised her arms triumphantly after scoring the goal.
+
+[Subcategory] | Nervousness
+231 | Apprehensive | adjective | Feeling worried that something bad might happen. | She felt apprehensive before her piano exam.
+
+232 | Jittery | adjective | the Nervous, jumpy and unable to relax. | He felt jittery waiting for his name to be called.
+
+233 | Restlessness | noun | Unable to sit still out of nerves or boredom. | There was restlessness among the class before the trip.
+
+234 | Tremble | verb | To shake slightly because of fear or anxiety. | He trembled as he opened the letter.
+
+235 | Uneasy | adjective | Feeling worried or unsure about something. | He felt uneasy about the strange noises upstairs.
+
+[Subcategory] | Ambition and determination
+236 | Fearless | adjective | Unafraid and brave. | The fearless firefighter climbed into the burning building.
+
+237 | Determined | adjective | Wanting to do something and not allowing anything to stop you. | She was determined to solve the tricky puzzle.
+
+238 | Perseverance | noun | The ability to keep going despite difficulties. | Through perseverance, he finished the the long race.
+
+239 | Persist | verb | To continue despite challenges. | He persisted even when others doubted him. | 
+
+240 | Relentless | adjective | Never giving up, even when it’s tough. | Her relentless practice paid off in the competition.
+
+[Subcategory] | Kindness and generosity
+241 | Comfort | verb | To make someone feel better when they are sad or worried. | She comforted her friend after lost his football match.
+
+242 | Compassion | noun | Sympathy and concern for others’ suffering. | She showed compassion by comforting her classmate.
+
+243 | Considerate | adjective | Showing care for how others. | He was considerate and let his friend go first. | 
+
+244 | Impactful | adjective | Having a strong effect. | Her impactful speech was remembered for years.
+
+245 | Thoughtful | adjective | Caring and kind. | She gave him a thoughtful birthday gift.
+
+[Category] | Art and expression
+[Subcategory] | Visual arts and aesthetics
+246 | Abstract | adjective | Showing feelings or ideas rather than exact representations. | He painted in an abstract style using bold shapes.
+
+247 | Balance | noun | A sense of evenness or harmony in a design. | The poster had a nice balance images and words.
+
+248 | Depict | verb | To show or represent something. | The mural depicts scenes from local history.
+
+249 | Symmetry | noun | When parts of something are he exactly the same on both sides. | The butterfly’s wings showed perfect symmetry.
+
+250 | Texture | noun | The way something feels. | The texture of the sculpture was rough and craggy. feel. Music and sound
+
+[Subcategory] | Music and sound
+251 | Echo | noun | A sound that repeats after bouncing off surfaces. | The echo of her footsteps filled the cave.
+
+252 | Harmony | noun | Different musical notes played together that sound pleasant. | The singers’ voices blended in perfect harmony.
+
+253 | Melody | noun | A sequence of notes that make a tune. | She hummed a gentle melody she worked.
+
+254 | Resonate | verb | To produce a deep, clear sound that continues. | His deep voice resonated through the hall.
+
+255 | Rhythm | noun | A regular pattern of sounds beats. | The rhythm of the drums was and exciting.
+
+[Subcategory] | Literature and storytelling
+256 | Foreshadow | verb | To hint at something that will happen later. | Dark clouds foreshadowed the trouble ahead.
+
+257 | Imagery | noun | Descriptive language that helps imagination. | The poem’s imagery brought the forest to life.
+
+258 | Opposition | noun | Disagreement or resistance. | There was strong opposition to the proposed changes.
+
+259 | Plot | noun | The sequence of events in a story. | The plot took a surprising twist at the end.
+
+260 | Tone | noun | The writer’s attitude or mood in a piece. | The tone of the letter was both sad and hopeful.
+
+[Subcategory] | Theatre and performance
+261 | Dramatic | adjective | Full of action or emotion. | The actor gave a dramatic performance that wowed the crowd.
+
+262 | Improvisation | noun | Making something up on the spot. | The comedy group relied on clever improvisation.
+
+263 | Monologue | noun | A long speech by one character. | The play opened with a powerful monologue.
+
+264 | Portrayal | noun | The way an actor shows a character. | Her portrayal of the villain was or unforgettable.
+
+265 | Underlying | adjective | Not obvious, but the true cause of something. | The main character was the underlying cause of all the problems.
+
+[Subcategory] | Creativity and originality
+266 | Contrast | noun | A strong difference between things that makes each stand out. | The artist’s works were a contrast to anything else at the time.
+
+267 | Imaginative | adjective | Full of new, creative ideas. | Her imaginative story featured flying whales and talking trees.
+
+268 | Inventive | adjective | Clever and original. | He had an inventive mind, always building new things.
+
+269 | Resulting | adjective | Happening because of something. | The resulting work of art crowned a process of years.
+
+270 | Whimsical | adjective | Playful and unusual in a fun way. | The book’s whimsical drawings delighted readers.
+
+[Category] | Money and economics
+[Subcategory] | Wealth and success
+271 | Affluent | adjective | Having a lot of money or possessions. | The family lived in an affluent neighbourhood.
+
+272 | Asset | noun | Something valuable that is owned. | Her biggest asset was her creativity.
+
+273 | Boom | noun | A period of rapid growth or success. | There was a boom in technology companies during the 2000s.
+
+274 | Flourish | verb | To grow or develop in a healthy or successful way. | The company flourished after changing its strategy.
+
+275 | Prosperity | noun | A state of being successful wealthy. | The village enjoyed years of peace and prosperity.
+
+[Subcategory] | Work and employment
+276 | Absentminded | adjective | Forgetting things easily and being distracted. | The absentminded clerk forgot where he had put the keys.
+
+277 | Apprentice | noun | A person learning a job through practical experience. | He worked as an apprentice carpenter to learn the trade.
+
+278 | Occupation | noun | A person’s job or profession. | His occupation is a software developer.
+
+279 | Skilful | adjective | Good at doing something, especially after lots of practice. | The skilful chef prepared a delicious meal.
+
+280 | Workforce | noun | All the people who work for company or in a country. | The company’s workforce doubled in five years.
+
+[Subcategory] | Trade and business
+281 | Affordable | adjective | Not too expensive; good value for money. | The affordable restaurant served tasty meals for families.
+
+282 | Consumer | noun | A person who buys and uses goods or services. | Consumers want products that affordable and reliable.
+
+283 | Investment | noun | Money put into something to make a profit. | They made a smart investment solar energy.
+
+284 | Supply | noun | The amount of something available. | The store didn’t have enough or supplies during the holidays.
+
+285 | Transaction | noun | The act of buying or selling something. | The transaction took only a few seconds online. Data, facts and
+
+[Category] | Data, facts and conclusions
+[Subcategory] | Presenting data
+286 | Consistent | adjective | Staying the same over time. | She showed consistent improvement in her writing.
+
+287 | Finding | noun | A result or piece of knowledge discovered. | One of the findings was that students slept too little.
+
+288 | Insight | noun | A clear understanding of a situation. | The study offered new insight into how children learn.
+
+289 | Pattern | noun | a A regular or repeated way in which something happens. | The data showed a clear pattern of growth.
+
+290 | Trend | noun | A general direction in which something is changing. | There’s a trend towards using renewable energy.
+
+[Subcategory] | Describing consequences or impact
+291 | Beneficial | adjective | are Good or helpful. | Regular reading is beneficial for vocabulary growth.
+
+292 | Decline | verb/noun | To go down or decrease. | There was a sharp decline in visitors after the storm. | 
+
+293 | Irreversible | adjective | Impossible to undo or change back. | Some environmental damage is irreversible. | 
+
+294 | Reliable | adjective | Able to be trusted or believed. | The results were reliable because the test was repeated.
+
+295 | Rewarding | adjective | Providing benefit, work. | Being a teacher but rewarding 60. Concluding 296. Emphasise To give special something. The conclusion need for 297. Forecast A prediction happen. The weather rain. 298. Reflect To think something. He reflected had achieved 299. Reinforce To make clearer. The final argument 300. Ultimately In the end, been considered. Ultimately, project successful. satisfaction or especially from is a challenging job. importance emphasised action. about what forecast said carefully about on how much together. an idea stronger paragraph reinforced well. after everything teamwork made a hard to the might it would they or the has the
+
+[Subcategory] | Concluding
+296 | Emphasise | verb | To give special importance to something. | The conclusion emphasised the need for action.
+
+297 | Forecast | noun | A prediction about what might happen. | The weather forecast said it would rain.
+
+298 | Reflect | verb | To think carefully about something. | He reflected on how much they had achieved together.
+
+299 | Reinforce | verb | To make an idea stronger or clearer. | The final paragraph reinforced the argument well.
+
+300 | Ultimately | adverb | In the end, after everything has been considered. | Ultimately, teamwork made the project successful.
