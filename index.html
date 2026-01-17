@@ -174,6 +174,9 @@
     }
     .modal{
       width:min(1020px, 100%);
+      max-height:90vh;
+      display:flex;
+      flex-direction:column;
       background:#fff;
       border:1px solid var(--border);
       border-radius:18px;
@@ -182,11 +185,12 @@
     }
     .modalHeader{
       display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0;
       padding:14px 16px;
       border-bottom:1px solid var(--border);
     }
     .modalHeader h2{margin:0; font-size:16px;}
-    .modalBody{padding:14px 16px;}
+    .modalBody{overflow-y:auto; flex:1; padding:14px 16px;}
     .closeX{
       border:1px solid var(--border);
       border-radius:999px;
@@ -211,6 +215,7 @@
       grid-template-columns: 1fr 1fr;
       gap:12px;
       margin-top:10px;
+      height:600px;
     }
     @media (max-width: 920px){
       .split{grid-template-columns:1fr;}
@@ -220,9 +225,11 @@
       border-radius:14px;
       padding:12px;
       background:#fff;
+      display:flex;
+      flex-direction:column;
     }
-    .panel h3{margin:0 0 10px; font-size:14px;}
-    .scroll{max-height:340px; overflow:auto; padding-right:6px;}
+    .panel h3{margin:0 0 10px; font-size:14px;flex-shrink:0;}
+    .scroll{flex:1; overflow:auto; padding-right:6px;}
     .catRow{
       display:flex; gap:10px; align-items:center; justify-content:space-between;
       padding:8px 8px; border-radius:10px;
@@ -245,6 +252,43 @@
     th, td{border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; vertical-align:top;}
     th{color:var(--muted); font-weight:700;}
   
+    /* Animations */
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes flip {
+      0% {
+        transform: rotateX(0deg);
+      }
+      50% {
+        transform: rotateX(90deg);
+      }
+      100% {
+        transform: rotateX(0deg);
+      }
+    }
+    
+    .tile.pop {
+      animation: pop 0.15s ease-in-out;
+    }
+    
+    .tile.flip {
+      animation: flip 0.6s ease-in-out forwards;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+      20%, 40%, 60%, 80% { transform: translateX(8px); }
+    }
+    
+    .tile.shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
     .outcomeBanner{
       padding: 12px 14px;
       border-radius: 12px;
@@ -479,11 +523,11 @@
         <div class="split">
           <div class="panel">
             <h3>Category / Subcategory selection</h3>
-            <div class="rowButtons" style="margin-top:0;">
+            <div class="rowButtons" style="margin-top:0;flex-shrink:0;">
               <button id="btnAllCats">All categories</button>
               <button id="btnNoCats">No categories</button>
             </div>
-            <hr class="divider"/>
+            <hr class="divider" style="flex-shrink:0;"/>
             <div id="selector" class="scroll"></div>
           </div>
 
@@ -500,6 +544,15 @@
             <h3>Settings</h3>
             <div class="muted" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <span class="muted">Words per session</span>
+                <input id="inpSessionWords" type="number" min="5" max="100" step="5" value="10" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+              </label>
+              <div style="width:100%;height:1px;background:#eee;margin:8px 0;"></div>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input id="chkCheckWordValidity" type="checkbox">
+                <span><b>Check word validity</b> (reject invalid words)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
                 <input id="chkEnableReveal" type="checkbox">
                 <span><b>Enable “Reveal” button</b> (shown during sessions)</span>
               </label>
@@ -511,14 +564,11 @@
                 <span class="muted">Seconds per word</span>
                 <input id="inpTimerSeconds" type="number" min="10" max="3600" step="10" value="120" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
               </label>
-              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-                <span class="muted">Words per session</span>
-                <input id="inpSessionWords" type="number" min="5" max="100" step="5" value="10" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
-              </label>
               <div style="width:100%;height:1px;background:#eee;margin:8px 0;"></div>
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
                 <span class="muted"><b>Field separator</b></span>
-                <select id="selFieldSeparator" style="padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+                <span class="muted">Auto-detect (|, TAB, spaces)</span>
+                <select id="selFieldSeparator" style="padding:8px 10px;border:1px solid #ddd;border-radius:12px;display:none;">
                   <option value="auto">Auto-detect (|, TAB, spaces)</option>
                   <option value="pipe">Pipe (|)</option>
                   <option value="tab">Tab character</option>
@@ -657,6 +707,7 @@ const btnNew = document.getElementById("btnNew");
   const btnReveal = document.getElementById("btnReveal");
   const chkEnableReveal = document.getElementById("chkEnableReveal");
   const chkEnableTimer = document.getElementById("chkEnableTimer");
+  const chkCheckWordValidity = document.getElementById("chkCheckWordValidity");
   const inpTimerSeconds = document.getElementById("inpTimerSeconds");
   const inpSessionWords = document.getElementById("inpSessionWords");
   const selFieldSeparator = document.getElementById("selFieldSeparator");
@@ -817,6 +868,8 @@ const btnNextWord = document.getElementById("btnNextWord");
   let sessionWordsCount = 10; // words per session
   let fieldSeparator = "auto"; // "auto", "pipe", "tab", "spaces", or "custom"
   let customSeparator = ""; // for custom separator mode
+  let checkWordValidity = false; // check if input is a valid word
+  let validWords = new Set(); // set of valid words from loaded entries
   let timeLeft = 0;
   let timerHandle = null;
   let timerPaused = false;
@@ -837,6 +890,7 @@ const btnNextWord = document.getElementById("btnNextWord");
     try{
       revealEnabled = localStorage.getItem("wv_revealEnabled") === "1";
       timerEnabled = localStorage.getItem("wv_timerEnabled") === "1";
+      checkWordValidity = localStorage.getItem("wv_checkWordValidity") === "1";
       const ts = parseInt(localStorage.getItem("wv_timerSeconds") || "120", 10);
       timerSeconds = Number.isFinite(ts) && ts > 0 ? ts : 120;
       const sw = parseInt(localStorage.getItem("wv_sessionWords") || "10", 10);
@@ -846,7 +900,13 @@ const btnNextWord = document.getElementById("btnNextWord");
     }catch(_e){ revealEnabled = false; }
     applyRevealSetting();
     applyTimerSetting();
-    if (chkEnableReveal) chkEnableReveal.checked = revealEnabled; chkEnableTimer.checked = timerEnabled; inpTimerSeconds.value = String(timerSeconds); inpSessionWords.value = String(sessionWordsCount); selFieldSeparator.value = fieldSeparator; inpCustomSeparator.value = customSeparator;
+    if (chkEnableReveal) chkEnableReveal.checked = revealEnabled;
+    if (chkEnableTimer) chkEnableTimer.checked = timerEnabled;
+    if (chkCheckWordValidity) chkCheckWordValidity.checked = checkWordValidity;
+    if (inpTimerSeconds) inpTimerSeconds.value = String(timerSeconds);
+    if (inpSessionWords) inpSessionWords.value = String(sessionWordsCount);
+    if (selFieldSeparator) selFieldSeparator.value = fieldSeparator;
+    if (inpCustomSeparator) inpCustomSeparator.value = customSeparator;
   }
 
   function saveRevealSetting(val){
@@ -861,6 +921,24 @@ const btnNextWord = document.getElementById("btnNextWord");
   function applyRevealSetting(){
     if (!btnReveal) return;
     btnReveal.style.display = revealEnabled ? "inline-block" : "none";
+  }
+
+  async function isWordValid(word){
+    const upper = word.toUpperCase();
+    
+    // Check loaded vocabulary first (offline support)
+    const inLoadedVocab = validWords.has(upper);
+    if (inLoadedVocab) return true;
+    
+    // If not in loaded vocab, try API
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, { timeout: 3000 });
+      if (response.ok) return true;
+    } catch (e) {
+      // API failed
+    }
+    
+    return false;
   }
 
   function applyTimerSetting(){
@@ -988,14 +1066,22 @@ const btnNextWord = document.getElementById("btnNextWord");
   }
 
   function splitFields(line){
-    // Use global fieldSeparator setting to split the line
-    if (fieldSeparator === "custom" && customSeparator) {
-      return line.split(customSeparator);
-    } else if (fieldSeparator === "pipe") {
+    // Try custom separator first if provided
+    if (customSeparator) {
+      const escaped = customSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const customResult = line.split(new RegExp(escaped));
+      // If custom separator worked and produced multiple fields, use it
+      if (customResult.length > 1) {
+        return customResult;
+      }
+    }
+    
+    // Otherwise try auto-detect: pipe, tab, then spaces
+    if (line.includes("|")) {
       return line.split("|");
-    } else if (fieldSeparator === "tab") {
+    } else if (line.includes("\t")) {
       return line.split("\t");
-    } else if (fieldSeparator === "spaces") {
+    } else if (/\s{2,}/.test(line)) {
       return line.trim().split(/\s{2,}/);
     } else {
       // "auto" mode: try pipe first, then TAB, then multiple spaces
@@ -1124,6 +1210,11 @@ const btnNextWord = document.getElementById("btnNextWord");
       cb.checked = !!selectedCats[cat];
       cb.addEventListener("change", () => {
         selectedCats[cat] = cb.checked;
+        // If unchecking category, uncheck all its subcategories
+        if (!cb.checked && selectedSubs[cat]) {
+          for (const s of Object.keys(selectedSubs[cat])) selectedSubs[cat][s] = false;
+        }
+        // If checking category, check all its subcategories
         if (cb.checked && selectedSubs[cat]){
           for (const s of Object.keys(selectedSubs[cat])) selectedSubs[cat][s] = true;
         }
@@ -1154,10 +1245,15 @@ const btnNextWord = document.getElementById("btnNextWord");
 
         const scb = document.createElement("input");
         scb.type = "checkbox";
-        scb.checked = !!selectedSubs[cat][sub] && !!selectedCats[cat];
-        scb.disabled = !selectedCats[cat];
+        scb.checked = !!selectedSubs[cat][sub];
         scb.addEventListener("change", () => {
           selectedSubs[cat][sub] = scb.checked;
+          // If checking subcategory, also check the category
+          if (scb.checked) {
+            selectedCats[cat] = true;
+          }
+          // If unchecking, just uncheck the subcategory (don't auto-uncheck category)
+          renderSelector();
           updateDictCounts();
         });
 
@@ -1176,7 +1272,26 @@ const btnNextWord = document.getElementById("btnNextWord");
   }
 
   function loadFromText(text){
-    const looksStructured = /\[Category\]/i.test(text) || /\[Subcategory\]/i.test(text);
+    // Check if it looks structured:
+    // 1. Has [Category] or [Subcategory] markers, OR
+    // 2. Has lines with 4+ fields (4-field or 5-field format)
+    const hasMarkers = /\[Category\]/i.test(text) || /\[Subcategory\]/i.test(text);
+    
+    let looksStructured = hasMarkers;
+    if (!looksStructured) {
+      // Check if first few lines have 4+ fields
+      const lines = (text || "").split(/\r?\n/).filter(ln => ln.trim());
+      const checkLines = lines.slice(0, 10); // only check first 10 lines
+      for (const line of checkLines) {
+        if (/^(FORMAT:|FIELDS:|HEADERS:)/.test(line)) continue; // skip headers
+        const parts = splitFields(line);
+        // If we find a line with 4+ fields, it's likely structured
+        if (parts.length >= 4) {
+          looksStructured = true;
+          break;
+        }
+      }
+    }
 
     if (looksStructured){
       const structured = parseStructured(text);
@@ -1189,6 +1304,9 @@ const btnNextWord = document.getElementById("btnNextWord");
       buildSelectionStateFromEntries();
       renderSelector();
       updateDictCounts();
+      // Populate valid words set
+      validWords.clear();
+      structured.forEach(e => validWords.add(e.word.toUpperCase()));
       setDictStatus("Structured dictionary loaded.");
       return;
     }
@@ -1198,6 +1316,9 @@ const btnNextWord = document.getElementById("btnNextWord");
     buildSelectionStateFromEntries();
     renderSelector();
     updateDictCounts();
+    // Populate valid words set
+    validWords.clear();
+    allEntries.forEach(e => validWords.add(e.word.toUpperCase()));
     setDictStatus(allEntries.length ? "Simple word list loaded (uncategorised)." : "No usable entries found.");
   }
 
@@ -1612,16 +1733,41 @@ renderSideStats();
   // ---------------- Input handling ----------------
   function currentGuess(){ return grid[currentRow].join(""); }
 
-  function submit(){
+  async function submit(){
     if (!currentEntry || gameOverWord) return;
     if (currentCol < WORD_LEN){
       showToast("Not enough letters.");
+      // Shake the row to indicate error
+      for (let col = 0; col < currentCol; col++) {
+        const tile = document.querySelector(`[data-r="${currentRow}"][data-c="${col}"]`);
+        if (tile) {
+          tile.classList.add("shake");
+          tile.addEventListener("animationend", () => tile.classList.remove("shake"), { once: true });
+        }
+      }
       return;
     }
     const guess = currentGuess();
     if (guess.length !== WORD_LEN || [...guess].some(ch => !LETTER.test(ch))){
       showToast(`Invalid guess (must be ${WORD_LEN} letters A–Z).`);
       return;
+    }
+    
+    // Check word validity if enabled
+    if (checkWordValidity) {
+      const valid = await isWordValid(guess);
+      if (!valid) {
+        showToast("Input is not a valid word!");
+        // Shake all tiles in current row
+        for (let col = 0; col < WORD_LEN; col++) {
+          const tile = document.querySelector(`[data-r="${currentRow}"][data-c="${col}"]`);
+          if (tile) {
+            tile.classList.add("shake");
+            tile.addEventListener("animationend", () => tile.classList.remove("shake"), { once: true });
+          }
+        }
+        return;
+      }
     }
 
     const evals = evaluateGuess(guess, answer);
@@ -1630,13 +1776,55 @@ renderSideStats();
       const ch = guess[i];
       keyState[ch] = mergeKeyState(keyState[ch], evals[i]);
     }
+    
+    const submittedRow = currentRow;
     currentRow++;
     currentCol = 0;
-    render();
+    
+    // Render without the submitted row's colors first
+    const tiles = boardEl.querySelectorAll(".tile");
+    tiles.forEach(tile=>{
+      const r = +tile.dataset.r;
+      const c = +tile.dataset.c;
+      const ch = grid[r][c];
+      tile.textContent = ch;
+      tile.className = "tile" + (ch ? " filled" : "");
+      // Don't apply state to the submitted row yet
+      if (r !== submittedRow && states[r][c]) {
+        tile.classList.add(states[r][c]);
+      }
+    });
+    
+    // Update keyboard
+    document.querySelectorAll(".key").forEach(btn=>{
+      const label = btn.textContent;
+      if (label==="ENTER"||label==="⌫") return;
+      const st = keyState[label];
+      btn.classList.remove("absent","present","correct");
+      if (st) btn.classList.add(st);
+    });
+    
+    // Add flip animation to tiles from left to right with delay and apply color mid-flip
+    for (let col = 0; col < WORD_LEN; col++) {
+      const tile = document.querySelector(`[data-r="${submittedRow}"][data-c="${col}"]`);
+      if (tile) {
+        setTimeout(() => {
+          tile.classList.add("flip");
+          // Apply color class at the midpoint of flip animation (300ms)
+          setTimeout(() => {
+            tile.classList.add(evals[col]);
+          }, 300);
+        }, col * 100); // 100ms delay between each tile
+      }
+    }
 
     if (guess === answer){
-      lastOutcome = { kind: "success", text: "🎉 Correct!" };
-      endWordAndShowResult(true);
+      // Calculate animation completion time: last tile starts at (WORD_LEN-1)*100ms and takes 600ms to flip
+      const animationDelay = (WORD_LEN - 1) * 100 + 600;
+      setTimeout(() => {
+        lastOutcome = { kind: "success", text: "🎉 Correct!" };
+        endWordAndShowResult(true);
+      }, animationDelay);
       return;
     }
     if (currentRow >= MAX_ATTEMPTS){
@@ -1666,8 +1854,18 @@ renderSideStats();
     if (!currentEntry || gameOverWord) return;
     if (currentCol >= WORD_LEN) return;
     grid[currentRow][currentCol] = letter;
+    const col = currentCol;
     currentCol++;
     render();
+    
+    // Add pop animation to the tile
+    const tile = document.querySelector(`[data-r="${currentRow}"][data-c="${col}"]`);
+    if (tile) {
+      tile.classList.add("pop");
+      tile.addEventListener("animationend", () => {
+        tile.classList.remove("pop");
+      }, { once: true });
+    }
   }
 
   function reveal(){
@@ -1800,6 +1998,10 @@ btnHintCAT.addEventListener("click", ()=>useHint("cat"));
   });
 
   btnApplyRaw.addEventListener("click", () => {
+    // Update customSeparator from input before parsing
+    if (inpCustomSeparator) {
+      customSeparator = inpCustomSeparator.value || "";
+    }
     loadFromText(dictInput.value || "");
   });
 
@@ -1810,6 +2012,16 @@ btnHintCAT.addEventListener("click", ()=>useHint("cat"));
       saveRevealSetting(chkEnableReveal.checked);
     });
   }
+  // Word validity check setting
+  if (chkCheckWordValidity) {
+    chkCheckWordValidity.addEventListener("change", () => {
+      checkWordValidity = chkCheckWordValidity.checked;
+      try {
+        localStorage.setItem("wv_checkWordValidity", checkWordValidity ? "1" : "0");
+      } catch(_e) {}
+    });
+  }
+  
   // Timer settings
   if (chkEnableTimer) {
     chkEnableTimer.addEventListener("change", () => {
@@ -1872,10 +2084,9 @@ btnHintCAT.addEventListener("click", ()=>useHint("cat"));
     inpCustomSeparator.addEventListener("change", () => {
       customSeparator = inpCustomSeparator.value || "";
       saveTimerSetting();
-      // Re-parse if custom separator is selected and there's a dictionary
-      if (fieldSeparator === "custom" && allEntries.length && dictInput) {
-        loadFromText(dictInput.value);
-      }
+    });
+    inpCustomSeparator.addEventListener("keyup", () => {
+      customSeparator = inpCustomSeparator.value || "";
     });
     inpCustomSeparator.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -1899,6 +2110,12 @@ btnAllCats.addEventListener("click", () => {
   btnNoCats.addEventListener("click", () => {
     for (const cat of Object.keys(selectedCats)){
       selectedCats[cat] = false;
+      // Also uncheck all subcategories for this category
+      if (selectedSubs[cat]) {
+        for (const sub of Object.keys(selectedSubs[cat])) {
+          selectedSubs[cat][sub] = false;
+        }
+      }
     }
     renderSelector();
     updateDictCounts();
