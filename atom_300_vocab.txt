@@ -162,7 +162,7 @@ HEADERS: [Category] / [Subcategory]
 [Subcategory] | Gestures and body language
 71 | Shrug | verb/noun | To raise your shoulders, usually to show uncertainty. | He shrugged when asked if he wanted dessert.
 
-72 | Nod | verb/noun | the To move your head up and down in agreement. | She nodded eagerly when offered a second slice of cake.
+72 | Nod | verb/noun | To move your head up and down in agreement. | She nodded eagerly when offered a second slice of cake.
 
 73 | Wince | verb/noun | To flinch or involuntarily pull a face due to pain or discomfort. | He winced as the doctor touched his injured knee.
 

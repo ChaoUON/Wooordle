@@ -598,7 +598,7 @@
             <div class="muted" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
                 <span class="muted">Words per session</span>
-                <input id="inpSessionWords" type="number" min="5" max="100" step="5" value="10" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
+                <input id="inpSessionWords" type="number" min="5" max="100" step="1" value="10" style="width:110px;padding:8px 10px;border:1px solid #ddd;border-radius:12px;">
               </label>
               <div style="width:100%;height:1px;background:#eee;margin:8px 0;"></div>
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
@@ -670,9 +670,31 @@
       <div class="modalBody">
         <div id="statsBody"></div>
         <div class="rowButtons" style="margin-top:12px;">
-          <button id="btnNewFromStats" class="primary">New session</button>
-          <button id="btnContinueFromStats" style="display:none;">Next word</button>
+          <button id="btnContinueFromStats" class="primary" style="display:none;">Next word</button>
           <button id="btnBackToGame">Back to game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API enrichment confirmation modal -->
+  <div id="apiConfirmBackdrop" class="modalBackdrop" role="dialog" aria-modal="true" aria-label="API enrichment confirmation" style="display:none;">
+    <div class="modal" style="max-width:500px;">
+      <div class="modalHeader">
+        <h2>Enrich word information</h2>
+      </div>
+      <div class="modalBody">
+        <div style="margin-bottom:16px; line-height:1.6;">
+          <p>You have <b id="apiWordCount">0</b> words in your list.</p>
+          <p>Would you like to automatically fetch <b>definitions, part of speech, and examples</b> from an online dictionary?</p>
+          <p style="font-size:13px; color:#666; margin-top:12px;">
+            ⏱️ This may take <b id="apiEstTime">10-15 seconds</b>. Requires internet connection.<br/>
+            If a word is not found, it will be imported without additional information.
+          </p>
+        </div>
+        <div class="rowButtons">
+          <button id="btnApiYes" class="primary">Yes, enrich with info</button>
+          <button id="btnApiNo">No, import as simple list</button>
         </div>
       </div>
     </div>
@@ -811,7 +833,6 @@ const btnNextWord = document.getElementById("btnNextWord");
   const statsBackdrop = document.getElementById("statsBackdrop");
   const btnCloseStats = document.getElementById("btnCloseStats");
   const statsBody = document.getElementById("statsBody");
-  const btnNewFromStats = document.getElementById("btnNewFromStats");
   const btnContinueFromStats = document.getElementById("btnContinueFromStats");
   const btnBackToGame = document.getElementById("btnBackToGame");
 
@@ -1081,6 +1102,232 @@ const btnNextWord = document.getElementById("btnNextWord");
 
 
 
+  // -------- API Cache (for enriching simple word lists) --------
+  const apiCache = {}; // {word: {pos, definition, example, topics}}
+  
+  // Threshold: ask user when word count exceeds this value
+  const API_PROMPT_THRESHOLD = 50;
+  
+  // Track pending API enrichment operation
+  let pendingApiEnrichment = null; // {words: [...], resolve: fn, reject: fn}
+
+  // Optional: Wordnik API key (set via DevTools: localStorage.setItem("wv_wordnikKey", "YOUR_KEY"))
+  localStorage.setItem("wv_wordnikKey", "eorp9h4cbskuqo5t3gi2q0ckxac13e1gwixpl61roemeyww4z")
+  function getWordnikKey(){
+    try{
+      return localStorage.getItem("wv_wordnikKey") || "";
+    }catch(_e){ return ""; }
+  }
+  
+  async function fetchWordnikRelatedTopics(lower, wk){
+    try {
+      const url = `https://api.wordnik.com/v4/word.json/${encodeURIComponent(lower)}/relatedWords?useCanonical=true&relationshipTypes=topic&limitPerRelationshipType=5&api_key=${wk}`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return [];
+      const data = await res.json();
+      const rel = data?.find(r => (r.relationshipType || "").toLowerCase() === "topic");
+      return Array.isArray(rel?.words) ? rel.words.filter(Boolean) : [];
+    } catch(_e){ return []; }
+  }
+
+  // Single Wordnik definitions call + topic enrichment helper
+  async function fetchWordnikDefinition(lower, wk){
+    const url = `https://api.wordnik.com/v4/word.json/${encodeURIComponent(lower)}/definitions?limit=10&includeRelated=true&useCanonical=true&includeTags=true&api_key=${wk}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
+    if (!res.ok) return null;
+    const defs = await res.json();
+    
+    // Get topics from first definition or via relatedWords
+    const d0 = defs?.[0] || {};
+    const topicsFromLabels = (d0.labels || []).map(l => l.text || "").filter(Boolean);
+    
+    let topicsFinal = topicsFromLabels;
+    if (!topicsFinal.length) {
+      const relTopics = await fetchWordnikRelatedTopics(lower, wk);
+      topicsFinal = relTopics;
+    }
+
+    // Extract all definitions with pos and example
+    const allDefs = [];
+    for (const d of defs) {
+      if (d.text) {
+        allDefs.push({
+          pos: d.partOfSpeech || "",
+          definition: d.text,
+          example: (d.exampleUses && d.exampleUses[0]?.text) || ""
+        });
+      }
+    }
+
+    return { definitions: allDefs, topics: topicsFinal };
+  }
+
+  async function getWordInfoFromAPI(word) {
+    const lower = word.toLowerCase();
+    const wk = getWordnikKey();
+    
+    // Helper to store + return
+    const cacheAndReturn = (info) => {
+      apiCache[lower] = info;
+      return info;
+    };
+
+    // Check cache first
+    const cached = apiCache[lower];
+    if (cached) {
+      // Convert old format to new format if needed
+      if (!cached.definitions && cached.definition) {
+        const converted = {
+          definitions: [{
+            pos: cached.pos || "",
+            definition: cached.definition || "",
+            example: cached.example || ""
+          }],
+          topics: cached.topics || []
+        };
+        return cacheAndReturn(converted);
+      }
+      
+      // If topics missing and Wordnik key available, try to enrich
+      if (wk && (!cached.topics || cached.topics.length === 0)) {
+        try {
+          const enriched = await fetchWordnikDefinition(lower, wk);
+          if (enriched && enriched.topics && enriched.topics.length) {
+            const merged = { ...cached, ...enriched };
+            return cacheAndReturn(merged);
+          }
+        } catch(_e){}
+      }
+      return cached;
+    }
+
+    // Try Wordnik first if key is available (faster single-call path)
+    if (wk) {
+      try {
+        const wordnikInfo = await fetchWordnikDefinition(lower, wk);
+        if (wordnikInfo) {
+          return cacheAndReturn(wordnikInfo);
+        }
+      } catch (e) {
+        console.warn(`Wordnik error for "${word}":`, e);
+      }
+    }
+
+    // Fallback: Free Dictionary API (no topics)
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${lower}`, {
+        signal: AbortSignal.timeout(5000)
+      });
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      const entry = data[0] || {};
+      const meanings = Array.isArray(entry.meanings) ? entry.meanings : [];
+
+      // Extract ALL definitions with their pos and example
+      const allDefs = [];
+      for (const m of meanings) {
+        const pos = m.partOfSpeech || "";
+        const defs = Array.isArray(m.definitions) ? m.definitions : [];
+        for (const d of defs) {
+          if (d.definition) {
+            allDefs.push({
+              pos,
+              definition: d.definition,
+              example: d.example || ""
+            });
+          }
+        }
+      }
+      
+      const result = {
+        definitions: allDefs,  // Array of {pos, definition, example}
+        topics: []
+      };
+      
+      return cacheAndReturn(result);
+    } catch (error) {
+      console.warn(`API error for word "${word}":`, error);
+      return null;
+    }
+  }
+  
+  async function enrichWordsWithAPI(words) {
+    const enriched = [];
+    setDictStatus(`Fetching word information from API (${words.length} words)...`);
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = normaliseWord(words[i].trim());
+      if (!word) continue;
+      
+      // Show progress
+      if (i % 5 === 0) {
+        setDictStatus(`Fetching word information... ${i}/${words.length}`);
+        await new Promise(r => setTimeout(r, 50)); // Brief pause to allow UI update
+      }
+      
+      const info = await getWordInfoFromAPI(word);
+      const topics = info?.topics || [];
+      const topic = topics.find(t => t.trim()) || "";
+
+      // Get all definitions
+      const defs = info?.definitions || [];
+      
+      if (defs.length > 0) {
+        // Create a separate entry for each definition
+        defs.forEach((def, idx) => {
+          const entry = {
+            number: enriched.length + 1,
+            word,
+            pos: def.pos || "",
+            definition: def.definition || "(no definition found)",
+            example: def.example || "(no example found)",
+            category: topic || "Undefined Category (Default)"
+          };
+          enriched.push(entry);
+        });
+      } else {
+        // Fallback: create single entry with missing info
+        const entry = {
+          number: enriched.length + 1,
+          word,
+          pos: "",
+          definition: "(no definition found)",
+          example: "(no example found)",
+          category: topic || "Undefined Category (Default)"
+        };
+        enriched.push(entry);
+      }
+    }
+    
+    setDictStatus(`API enrichment complete: ${enriched.length} entries from ${words.length} word(s).`);
+    return enriched;
+  }
+
+  // Save/load cache from localStorage
+  function saveCacheToStorage() {
+    try {
+      localStorage.setItem("wv_apiCache", JSON.stringify(apiCache));
+    } catch (_e) {
+      console.warn("Failed to save API cache");
+    }
+  }
+  
+  function loadCacheFromStorage() {
+    try {
+      const cached = localStorage.getItem("wv_apiCache");
+      if (cached) {
+        const loaded = JSON.parse(cached);
+        Object.assign(apiCache, loaded);
+      }
+    } catch (_e) {
+      console.warn("Failed to load API cache");
+    }
+  }
+
+  // Load cache on startup
+  loadCacheFromStorage();
+
   // ---------------- Dictionary model ----------------
   // Each entry: {category, subcategory, number, word, pos, definition, example}
   let allEntries = [];
@@ -1226,7 +1473,8 @@ const btnNextWord = document.getElementById("btnNextWord");
     for (const e of allEntries){
       if (!Object.prototype.hasOwnProperty.call(selectedCats, e.category)) selectedCats[e.category] = true;
       if (!selectedSubs[e.category]) selectedSubs[e.category] = {};
-      if (!Object.prototype.hasOwnProperty.call(selectedSubs[e.category], e.subcategory)) selectedSubs[e.category][e.subcategory] = true;
+      // Only add subcategory if it exists and is non-empty
+      if (e.subcategory && !Object.prototype.hasOwnProperty.call(selectedSubs[e.category], e.subcategory)) selectedSubs[e.category][e.subcategory] = true;
     }
   }
 
@@ -1277,7 +1525,9 @@ const btnNextWord = document.getElementById("btnNextWord");
 
       const label = document.createElement("div");
       const subCount = Object.keys(selectedSubs[cat] || {}).length;
-      label.innerHTML = `<b>${esc(cat)}</b><div class="muted">${subCount} subcategories</div>`;
+      label.innerHTML = subCount > 0
+        ? `<b>${esc(cat)}</b><div class="muted">${subCount} subcategories</div>`
+        : `<b>${esc(cat)}</b>`;
 
       left.appendChild(cb);
       left.appendChild(label);
@@ -1285,46 +1535,49 @@ const btnNextWord = document.getElementById("btnNextWord");
       catRow.appendChild(left);
       selectorEl.appendChild(catRow);
 
-      const subList = document.createElement("div");
-      subList.className = "subList";
-
       const subs = Object.keys(selectedSubs[cat] || {}).sort((a,b)=>a.localeCompare(b));
-      for (const sub of subs){
-        const subRow = document.createElement("div");
-        subRow.className = "subItem";
+      // Only render subcategory list if there are subcategories
+      if (subs.length > 0) {
+        const subList = document.createElement("div");
+        subList.className = "subList";
 
-        const subLeft = document.createElement("div");
-        subLeft.className = "catLeft";
+        for (const sub of subs){
+          const subRow = document.createElement("div");
+          subRow.className = "subItem";
 
-        const scb = document.createElement("input");
-        scb.type = "checkbox";
-        scb.checked = !!selectedSubs[cat][sub];
-        scb.addEventListener("change", () => {
-          selectedSubs[cat][sub] = scb.checked;
-          // If checking subcategory, also check the category
-          if (scb.checked) {
-            selectedCats[cat] = true;
-          }
-          // If unchecking, just uncheck the subcategory (don't auto-uncheck category)
-          renderSelector();
-          updateDictCounts();
-        });
+          const subLeft = document.createElement("div");
+          subLeft.className = "catLeft";
 
-        const subLabel = document.createElement("div");
-        subLabel.textContent = sub;
+          const scb = document.createElement("input");
+          scb.type = "checkbox";
+          scb.checked = !!selectedSubs[cat][sub];
+          scb.addEventListener("change", () => {
+            selectedSubs[cat][sub] = scb.checked;
+            // If checking subcategory, also check the category
+            if (scb.checked) {
+              selectedCats[cat] = true;
+            }
+            // If unchecking, just uncheck the subcategory (don't auto-uncheck category)
+            renderSelector();
+            updateDictCounts();
+          });
 
-        subLeft.appendChild(scb);
-        subLeft.appendChild(subLabel);
+          const subLabel = document.createElement("div");
+          subLabel.textContent = sub;
 
-        subRow.appendChild(subLeft);
-        subList.appendChild(subRow);
+          subLeft.appendChild(scb);
+          subLeft.appendChild(subLabel);
+
+          subRow.appendChild(subLeft);
+          subList.appendChild(subRow);
+        }
+
+        selectorEl.appendChild(subList);
       }
-
-      selectorEl.appendChild(subList);
     }
   }
 
-  function loadFromText(text){
+  function loadFromText(text, enrichWithAPI = false){
     // Check if it looks structured:
     // 1. Has [Category] or [Subcategory] markers, OR
     // 2. Has lines with 4+ fields (4-field or 5-field format)
@@ -1365,14 +1618,87 @@ const btnNextWord = document.getElementById("btnNextWord");
     }
 
     // Non-structured: simple word list
-    allEntries = parseSimpleWords(text);
+    const simpleWords = parseSimpleWords(text);
+    if (!simpleWords.length){
+      setDictStatus("No usable entries found.");
+      return;
+    }
+    
+    // For simple word lists, decide whether to prompt for API enrichment
+    const wordCount = simpleWords.length;
+    
+    if (enrichWithAPI) {
+      // Directly enrich without asking
+      const wordsToEnrich = simpleWords.map(w => w.word);
+      enrichWordsWithAPI(wordsToEnrich).then(enriched => {
+        allEntries = enriched;
+        buildSelectionStateFromEntries();
+        renderSelector();
+        updateDictCounts();
+        validWords.clear();
+        enriched.forEach(e => validWords.add(e.word.toUpperCase()));
+        saveCacheToStorage();
+      });
+    } else if (wordCount > API_PROMPT_THRESHOLD) {
+      // Too many words: ask user before using API
+      showApiConfirmDialog(simpleWords);
+    } else {
+      // Few enough words: automatically use API without asking
+      setDictStatus(`Simple word list loaded: ${wordCount} word(s). Automatically fetching word information...`);
+      const wordsToEnrich = simpleWords.map(w => w.word);
+      enrichWordsWithAPI(wordsToEnrich).then(enriched => {
+        allEntries = enriched;
+        buildSelectionStateFromEntries();
+        renderSelector();
+        updateDictCounts();
+        validWords.clear();
+        enriched.forEach(e => validWords.add(e.word.toUpperCase()));
+        saveCacheToStorage();
+      }).catch(() => {
+        // If API fails, fall back to simple list
+        loadSimpleWordList(simpleWords);
+      });
+    }
+  }
+  
+  // Helper function to load simple word list without API
+  function loadSimpleWordList(simpleWords) {
+    allEntries = simpleWords;
     buildSelectionStateFromEntries();
     renderSelector();
     updateDictCounts();
-    // Populate valid words set
     validWords.clear();
     allEntries.forEach(e => validWords.add(e.word.toUpperCase()));
-    setDictStatus(allEntries.length ? "Simple word list loaded (uncategorised)." : "No usable entries found.");
+    setDictStatus(`Simple word list loaded: ${simpleWords.length} word(s). (API info unavailable)`);
+  }
+  
+  // Show confirmation dialog for API enrichment when word count is high
+  function showApiConfirmDialog(simpleWords) {
+    const apiConfirmBackdrop = document.getElementById("apiConfirmBackdrop");
+    const apiWordCount = document.getElementById("apiWordCount");
+    const apiEstTime = document.getElementById("apiEstTime");
+    
+    if (!apiConfirmBackdrop) return;
+    
+    // Update UI with word count and estimated time
+    const wordCount = simpleWords.length;
+    apiWordCount.textContent = wordCount;
+    
+    // Estimate time based on word count (roughly 1 second per 5-10 words with delays)
+    const estSeconds = Math.ceil(wordCount / 8) + 5;
+    if (estSeconds <= 10) {
+      apiEstTime.textContent = "under 10 seconds";
+    } else if (estSeconds <= 30) {
+      apiEstTime.textContent = "10-30 seconds";
+    } else {
+      apiEstTime.textContent = `${estSeconds}-${estSeconds + 10} seconds`;
+    }
+    
+    // Store the words for processing
+    pendingApiEnrichment = simpleWords;
+    
+    // Show dialog
+    show(apiConfirmBackdrop);
   }
 
 
@@ -1584,7 +1910,7 @@ if (sideStatsCard) sideStatsCard.style.display = "none";
         <div class="statBox">
           <div class="muted">Category</div>
           <div><b>${esc(currentEntry.category)}</b></div>
-          <div class="muted">${esc(currentEntry.subcategory)}</div>
+          ${currentEntry.subcategory ? `<div class="muted">${esc(currentEntry.subcategory)}</div>` : ""}
           <hr class="divider"/>
           <div class="kpi"><div class="label">Attempts used</div><div class="big">${attemptsUsed}</div></div>
           <div class="kpi"><div class="label">Hints used</div><div class="big">${hintsUsedTotal}</div></div>
@@ -1712,7 +2038,7 @@ closeResult();
       const hu = r.hintsUsed.cat + r.hintsUsed.def + r.hintsUsed.ex;
       const definition = esc(r.entry.definition || "(none)");
       const example = esc(r.entry.example || "(none)");
-      const categoryLine = `${esc(r.entry.category)} / ${esc(r.entry.subcategory)}`;
+      const categoryLine = r.entry.subcategory ? `${esc(r.entry.category)} / ${esc(r.entry.subcategory)}` : esc(r.entry.category);
       return `
         <tr>
           <td>${idx+1}</td>
@@ -1767,7 +2093,7 @@ closeResult();
 
     
     // If stats is opened mid-session (after finishing a word), allow continuing directly.
-    if (typeof btnContinueFromStats !== "undefined" && btnContinueFromStats){
+    if (btnContinueFromStats){
       const canContinue = gameOverWord && sessionIndex < (sessionWords.length - 1);
       btnContinueFromStats.style.display = canContinue ? "inline-block" : "none";
     }
@@ -1777,6 +2103,7 @@ closeResult();
     const sessionFinished = (wordResults && sessionWords && wordResults.length === sessionWords.length);
     if (btnBackToGame){
       btnBackToGame.textContent = sessionFinished ? "End game" : "Back to game";
+      btnBackToGame.classList.toggle("primary", !!sessionFinished);
     }
 
     openStats();
@@ -1963,7 +2290,7 @@ renderSideStats();
 
     if (kind === "cat"){
       const cat = currentEntry.category || "(no category)";
-      const sub = currentEntry.subcategory || "(no subcategory)";
+      const sub = currentEntry.subcategory;
 
       const pool = getActivePool();
       const answer = (currentEntry.word || "").toUpperCase();
@@ -1993,8 +2320,10 @@ renderSideStats();
       }
 
       const chips = choices.map(w => `<span class="chip">${esc(w)}</span>`).join("");
+      // Only show subcategory if it exists
+      const categoryText = sub ? `${esc(sub)} in ${esc(cat)}` : esc(cat);
       currentHintLines.push(
-        `<b>Category</b>: ${esc(sub)} in ${esc(cat)}<br/><b>Answer is in</b>: <span class="chipRow">${chips}</span>`
+        `<b>Category</b>: ${categoryText}<br/><b>Answer is in</b>: <span class="chipRow">${chips}</span>`
       );
     } else if (kind === "def"){
       currentHintLines.push(`<b>Definition</b>: ${esc(currentEntry.definition || "(none)")}`);
@@ -2055,8 +2384,54 @@ btnHintCAT.addEventListener("click", ()=>useHint("cat"));
     if (inpCustomSeparator) {
       customSeparator = inpCustomSeparator.value || "";
     }
-    loadFromText(dictInput.value || "");
+    loadFromText(dictInput.value || "", false);
   });
+
+  // API enrichment confirmation dialog
+  const apiConfirmBackdrop = document.getElementById("apiConfirmBackdrop");
+  const btnApiYes = document.getElementById("btnApiYes");
+  const btnApiNo = document.getElementById("btnApiNo");
+
+  if (btnApiYes) {
+    btnApiYes.addEventListener("click", () => {
+      if (!pendingApiEnrichment) return;
+      hide(apiConfirmBackdrop);
+      const simpleWords = pendingApiEnrichment;
+      pendingApiEnrichment = null;
+      setDictStatus(`Fetching word information from API (${simpleWords.length} words)...`);
+      const wordsToEnrich = simpleWords.map(w => w.word);
+      enrichWordsWithAPI(wordsToEnrich).then(enriched => {
+        allEntries = enriched;
+        buildSelectionStateFromEntries();
+        renderSelector();
+        updateDictCounts();
+        validWords.clear();
+        enriched.forEach(e => validWords.add(e.word.toUpperCase()));
+        saveCacheToStorage();
+      }).catch(() => {
+        loadSimpleWordList(simpleWords);
+      });
+    });
+  }
+
+  if (btnApiNo) {
+    btnApiNo.addEventListener("click", () => {
+      if (!pendingApiEnrichment) return;
+      hide(apiConfirmBackdrop);
+      const simpleWords = pendingApiEnrichment;
+      pendingApiEnrichment = null;
+      loadSimpleWordList(simpleWords);
+    });
+  }
+
+  if (apiConfirmBackdrop) {
+    apiConfirmBackdrop.addEventListener("click", (e) => {
+      if (e.target === apiConfirmBackdrop) {
+        // Allow closing by clicking backdrop (defaults to "No")
+        if (btnApiNo) btnApiNo.click();
+      }
+    });
+  }
 
   
 
@@ -2188,10 +2563,6 @@ btnAllCats.addEventListener("click", () => {
 
   // Stats modal buttons
   btnCloseStats.addEventListener("click", closeStats);
-  btnNewFromStats.addEventListener("click", () => {
-    closeStats();
-    startSession();
-  });
   btnContinueFromStats.addEventListener("click", () => {
     // Continue the current session (go to next word) when possible.
     if (gameOverWord && sessionIndex < (sessionWords.length - 1)){
@@ -2214,12 +2585,63 @@ btnAllCats.addEventListener("click", () => {
 // Global keyboard: do not interfere with typing inside textarea
   window.addEventListener("keydown", (e) => {
     const active = document.activeElement;
-    const typing = active && active.tagName === "TEXTAREA";
-    if (typing) return;
+    
+    // ✅ Allow all keys if focused on input or textarea
+    if (
+      active instanceof HTMLInputElement ||
+      active instanceof HTMLTextAreaElement ||
+      (active && active.isContentEditable)
+    ) {
+      return;
+    }
+
+    const statsOpen = statsBackdrop.style.display === "flex";
+    const resultOpen = resultBackdrop.style.display === "flex";
+
+    // Session finished state
+    const sessionFinished = (
+      inSession &&
+      wordResults && sessionWords &&
+      wordResults.length === sessionWords.length
+    );
 
     if (dictBackdrop.style.display === "flex" && e.key === "Escape") { closeDict(); return; }
-    if (resultBackdrop.style.display === "flex" && e.key === "Escape") { closeResult(); return; }
-    if (statsBackdrop.style.display === "flex" && e.key === "Escape") { closeStats(); return; }
+    if (resultOpen && e.key === "Escape") { closeResult(); return; }
+    if (statsOpen && e.key === "Escape") { closeStats(); return; }
+
+    // ✅ Enter inside stats modal: Next word (mid-session) or End game (finished)
+    if (statsOpen && e.key === "Enter") {
+      e.preventDefault();
+      if (!sessionFinished && btnContinueFromStats && btnContinueFromStats.style.display !== "none") {
+        btnContinueFromStats.click();
+      } else if (btnBackToGame) {
+        btnBackToGame.click();
+      }
+      return;
+    }
+
+    // ✅ Enter on result modal triggers "Next word" button
+    if (resultOpen && e.key === "Enter") {
+      e.preventDefault();
+      if (btnNextWord) btnNextWord.click();
+      return;
+    }
+
+    // ✅ On main screen (no modal):
+    // - If word complete (between-words bar shown), Enter => Next word
+    // - Else if idle/finished, Enter => New session
+    if (!statsOpen && !resultOpen && e.key === "Enter") {
+      if (gameOverWord && betweenWordsBar && betweenWordsBar.style.display !== "none") {
+        e.preventDefault();
+        if (btnNextWordMain) btnNextWordMain.click();
+        return;
+      }
+      if ((!inSession || sessionFinished) && typeof btnNew !== "undefined" && btnNew) {
+        e.preventDefault();
+        btnNew.click();
+        return;
+      }
+    }
 
     if (e.key === "Enter") { e.preventDefault(); onKey("ENTER"); return; }
     if (e.key === "Backspace") { e.preventDefault(); onKey("⌫"); return; }
